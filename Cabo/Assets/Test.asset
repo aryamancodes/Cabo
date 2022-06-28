@@ -13,8 +13,6 @@ MonoBehaviour:
   m_Name: Test
   m_EditorClassIdentifier: 
   face: {fileID: 21300000, guid: 230fc61a1b1bf4671ad7e096b2e551a7, type: 3}
-  back: {fileID: 21300000, guid: 40bb75c83b0f24896a4e9068f8379c1d, type: 3}
   value: 1
   suit: 1
-  isPlayer: 0
-  isSpecialCard: 0
+  isSpecialCard: 1

@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.Security.Cryptography;
 
-public class GenerateDeck : MonoBehaviour
+public class DeckHandler: MonoBehaviour
 {
     public List<Sprite> heartCards = new List<Sprite>();
     public List<Sprite> diamondCards = new List<Sprite>();
@@ -12,7 +12,7 @@ public class GenerateDeck : MonoBehaviour
     public List<Sprite> clubCards = new List<Sprite>();
     public List<Sprite> jokers = new List<Sprite>(); 
     
-    public List<Card> deck = new List<Card>();
+    public static List<Card> deck = new List<Card>();
 
 
     void Start()
@@ -72,5 +72,13 @@ public class GenerateDeck : MonoBehaviour
             list[k] = list[n];
             list[n] = value;
         }
+    }
+
+    public static Card getCard()
+    {
+        var card = deck[0];
+        deck.RemoveAt(0);
+        Debug.Log("Length of deck is now " + deck.Count);
+        return card;
     }
 }

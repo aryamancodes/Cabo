@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 7672962104000214907}
   - component: {fileID: 7672962104000214905}
   - component: {fileID: 7672962104000214904}
-  - component: {fileID: -1824120607536496164}
+  - component: {fileID: -8825698727873679524}
+  - component: {fileID: -6282757987133872038}
   m_Layer: 5
   m_Name: Enemy Card
   m_TagString: Untagged
@@ -37,7 +38,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 61, y: 57}
-  m_SizeDelta: {x: 100, y: 100}
+  m_SizeDelta: {x: 32, y: 32}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7672962104000214905
 CanvasRenderer:
@@ -77,7 +78,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &-1824120607536496164
+--- !u!114 &-8825698727873679524
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -89,5 +90,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e30347f4551ff4a07b1c53511893e662, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  image: {fileID: 7672962104000214904}
   card: {fileID: 0}
   back: {fileID: 21300000, guid: 8bd1085a06c5848e5806cd31639b4ef2, type: 3}
+--- !u!114 &-6282757987133872038
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672962104000214906}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0b148fe25e99eb48b9724523833bab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Delegates:
+  - eventID: 4
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: -8825698727873679524}
+          m_TargetAssemblyTypeName: EnemyCard, Assembly-CSharp
+          m_MethodName: flipCard
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
