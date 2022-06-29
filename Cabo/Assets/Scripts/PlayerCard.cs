@@ -14,6 +14,9 @@ public class PlayerCard : MonoBehaviour
     private int value;
     private bool isSpecialCard;
     private bool hasCard;
+
+    private Color startColor;
+
     
     private bool faceUp = false;
      void Update()
@@ -31,12 +34,12 @@ public class PlayerCard : MonoBehaviour
     {
         if(faceUp)
         {
-            image.sprite = face;
+            image.sprite = back;
             
         }
         else
         {
-            image.sprite = back;
+            image.sprite = face;
         }
         faceUp = !faceUp;
     }

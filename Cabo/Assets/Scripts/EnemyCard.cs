@@ -34,12 +34,11 @@ public class EnemyCard : MonoBehaviour
     {
         if(faceUp)
         {
-            image.sprite = face;
-            
+            image.sprite = back;
         }
         else
         {
-            image.sprite = back;
+            image.sprite = face;
         }
         faceUp = !faceUp;
     }
