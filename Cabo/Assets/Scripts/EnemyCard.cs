@@ -6,9 +6,10 @@ using UnityEngine.UI;
 public class EnemyCard : MonoBehaviour
 {
     public Image image;
-
     public Card card = null;
     public Sprite back;
+    public GameObject slot;
+
 
     private Sprite face;
     private Card.Suit suit;

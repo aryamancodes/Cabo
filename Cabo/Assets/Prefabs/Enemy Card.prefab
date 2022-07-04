@@ -13,7 +13,9 @@ GameObject:
   - component: {fileID: 7672962104000214904}
   - component: {fileID: -8825698727873679524}
   - component: {fileID: -9165462225293800762}
-  m_Layer: 5
+  - component: {fileID: -893808092160699310}
+  - component: {fileID: 3176370592434264402}
+  m_Layer: 6
   m_Name: Enemy Card
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -93,6 +95,7 @@ MonoBehaviour:
   image: {fileID: 7672962104000214904}
   card: {fileID: 0}
   back: {fileID: 21300000, guid: 8bd1085a06c5848e5806cd31639b4ef2, type: 3}
+  slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
 --- !u!114 &-9165462225293800762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,3 +152,50 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!50 &-893808092160699310
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672962104000214906}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 0
+--- !u!61 &3176370592434264402
+BoxCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7672962104000214906}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0, y: 0}
+    oldSize: {x: 0, y: 0}
+    newSize: {x: 0, y: 0}
+    adaptiveTilingThreshold: 0
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  serializedVersion: 2
+  m_Size: {x: 70, y: 90}
+  m_EdgeRadius: 0

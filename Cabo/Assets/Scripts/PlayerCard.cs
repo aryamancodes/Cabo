@@ -8,6 +8,7 @@ public class PlayerCard : MonoBehaviour
     public Image image;
     public Card card = null;
     public Sprite back;
+    public GameObject slot;
 
     private Sprite face;
     private Card.Suit suit;
@@ -19,7 +20,8 @@ public class PlayerCard : MonoBehaviour
 
     
     private bool faceUp = false;
-     void Update()
+
+    void Start()
     {
         if(this.card != null && !hasCard)
         {
