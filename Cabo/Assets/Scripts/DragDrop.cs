@@ -61,6 +61,8 @@ public class DragDrop : MonoBehaviour
             if(dropZone.layer == UILayer) //drop in place card
             {
                 transform.position = placeCard.transform.position;
+                transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
+                transform.gameObject.layer = UILayer;
             }
 
             else
@@ -73,7 +75,8 @@ public class DragDrop : MonoBehaviour
         else
         {
             transform.SetParent(startParent.transform, true);
-            //transform.gameObject.layer = startParent.layer;
+            transform.rotation = Quaternion.identity;
+
         }
         dropZone = null;
     }
@@ -89,6 +92,7 @@ public class DragDrop : MonoBehaviour
                 {
                     transform.SetParent(child, true);
                     transform.gameObject.layer = dropZone.layer;
+                    transform.rotation = Quaternion.identity;
                     return;
                 }
             }
@@ -97,5 +101,6 @@ public class DragDrop : MonoBehaviour
         newSlot.transform.SetParent(dropZone.transform, false);
         transform.SetParent(newSlot.transform, false);
         transform.gameObject.layer = dropZone.layer;
+        transform.rotation = Quaternion.identity;
     }
 }

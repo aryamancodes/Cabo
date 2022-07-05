@@ -51,12 +51,9 @@ public class DeckHandler: MonoBehaviour
         }
         System.Random rng = new System.Random();
         Shuffle(deck);
-        // foreach(var card in deck){
-        //     Debug.Log(card.value+" "+card.suit);
-        // }
     }
 
-    //Fisher-Yates shuffle
+    //Fisher-Yates shuffle in-place
     void Shuffle(List<Card> list)
     {
         RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
@@ -78,7 +75,6 @@ public class DeckHandler: MonoBehaviour
     {
         var card = deck[0];
         deck.RemoveAt(0);
-        Debug.Log("Length of deck is now " + deck.Count);
         return card;
     }
 }

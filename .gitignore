@@ -9,6 +9,7 @@ Cabo/[Bb]uild/
 Cabo/[Bb]uilds/
 Cabo/[Ll]ogs/
 Cabo/[Mm]emoryCaptures/
+Cabo/[Aa]ssets/Photon/
 
 # Asset meta data should only be ignored when the corresponding asset is also ignored
 !/[Aa]ssets/**/*.meta
