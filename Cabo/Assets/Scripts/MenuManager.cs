@@ -16,11 +16,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public Button room;
     public TMP_Text roomname_text;
     public TMP_Text lobbyname_text;
+    public TMP_Text error_text;
     public GameObject lobby;
     public GameObject lobbyPlayer;
     public TMP_Text lobbyPlayer_text;
+    public Button startButton;
 
 
+    public bool firstLogin = true;
     void Awake()
     {
         Instance = this;
@@ -28,11 +31,10 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        //Debug.Log("Connecting to master");
-        //PhotonNetwork.ConnectUsingSettings();
+        Debug.Log("Connecting to master");
+        PhotonNetwork.ConnectUsingSettings();
         closeAll();
-        //REMOVE ONCE ROGERS STOPS FUCKING BEING ASS
-        openMenu("username");
+        openMenu("loading");
     }
 
     //Menu button functions
@@ -52,18 +54,13 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public void Button_createRoomClicked()
     {
-        //TODO: Check for duplicate room names
         if(string.IsNullOrEmpty(roomname_input.text))
         {
             return;
         }
         PhotonNetwork.CreateRoom(roomname_input.text);
-        Button newRoom = Instantiate(room, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,90)));
-        TMP_Text newRoomText = Instantiate(roomname_text, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,-90))); 
-        newRoom.name = roomname_input.text;
-        newRoomText.text = roomname_input.text;
-        newRoom.transform.SetParent(roomList.transform, false);
-        newRoomText.transform.SetParent(newRoom.transform, false);
+        openMenu("loading");
+
     }
 
     public void Button_joinRoomClicked()
@@ -76,42 +73,75 @@ public class MenuManager : MonoBehaviourPunCallbacks
         openMenu("join-select");
     }
 
-
-    //TODO: CAN THESE 2 FNS BE ONE W PHOTON?
-    public void Button_userRoomClicked()
+    public void Button_leaveRoom()
     {
-        lobbyname_text.text = EventSystem.current.currentSelectedGameObject.name;
-        GameObject newPlayer = Instantiate(lobbyPlayer, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,90)));
-        TMP_Text newPlayerText =  Instantiate(lobbyPlayer_text, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,-90))); 
-        newPlayerText.text = username_input.text;
-        newPlayer.transform.SetParent(lobby.transform, false);
-        newPlayerText.transform.SetParent(newPlayer.transform, false);
-        openMenu("lobby");
+        PhotonNetwork.LeaveRoom();
+        openMenu("loading");
     }
 
-    public void Button_userRoomCreated()
+    public void Button_userRoomClicked()
     {
-        lobbyname_text.text = roomname_input.text;
-        GameObject newPlayer = Instantiate(lobbyPlayer, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,90)));
-        TMP_Text newPlayerText =  Instantiate(lobbyPlayer_text, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,-90))); 
-        newPlayerText.text = username_input.text;
-        newPlayer.transform.SetParent(lobby.transform, false);
-        newPlayerText.transform.SetParent(newPlayer.transform, false);
-        openMenu("lobby");
+        string currRoom = EventSystem.current.currentSelectedGameObject.name;
+        PhotonNetwork.JoinRoom(currRoom); 
+        openMenu("loading");
     }
 
     //Photon functions
     public override void OnConnectedToMaster()
     {
-        Debug.Log("Connected to master");
+        Debug.Log("Connected to master");        
+        PhotonNetwork.AutomaticallySyncScene = true;
         PhotonNetwork.JoinLobby();
+        openMenu("loading");
     }
 
     public override void OnJoinedLobby()
     {
         Debug.Log("Joined lobby");
-        openMenu("username");
+        if(firstLogin)
+        {
+            openMenu("username");
+            firstLogin = false;
+        }
+        else
+        {
+            openMenu("join-select");
+        }
     }
+
+    public override void OnCreatedRoom()
+    {
+        Button newRoom = Instantiate(room, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,90)));
+        TMP_Text newRoomText = Instantiate(roomname_text, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,-90))); 
+        newRoom.name = roomname_input.text;
+        newRoomText.text = roomname_input.text;
+        newRoom.transform.SetParent(roomList.transform, false);
+        newRoomText.transform.SetParent(newRoom.transform, false); 
+        openMenu("loading"); 
+    }
+    public override void OnJoinedRoom()
+    {
+        lobbyname_text.text = PhotonNetwork.CurrentRoom.Name;
+        GameObject newPlayer = Instantiate(lobbyPlayer, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,90)));
+        TMP_Text newPlayerText =  Instantiate(lobbyPlayer_text, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,-90))); 
+        newPlayerText.text = username_input.text;
+        newPlayer.transform.SetParent(lobby.transform, false);
+        newPlayerText.transform.SetParent(newPlayer.transform, false);
+        openMenu("lobby");
+    }
+
+    public override void OnLeftRoom()
+    {
+        
+    }
+
+
+
+    public override void OnCreateRoomFailed(short returnCode, string message)
+	{
+		error_text.text = "Creating room failed: " + message;
+		openMenu("error");
+	}
 
     //menu helper functions
     public void openMenu(string name)
