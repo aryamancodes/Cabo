@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using TMPro;
 using Photon.Pun;
+using Photon.Realtime;
 
 public class MenuManager : MonoBehaviourPunCallbacks
 {
@@ -12,14 +13,17 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public List<Menu> menus;
     public TMP_InputField username_input;
     public TMP_InputField roomname_input;
-    public GameObject roomList;
-    public Button room;
+    public Room room_prefab;
+    public List<Room> roomList = new List<Room>();
+    public LobbyPlayer player_prefab;
+    public List<LobbyPlayer> playerList = new List<LobbyPlayer>();
+    public GameObject roomListMenu;
     public TMP_Text roomname_text;
     public TMP_Text lobbyname_text;
     public TMP_Text error_text;
     public GameObject lobby;
-    public GameObject lobbyPlayer;
-    public TMP_Text lobbyPlayer_text;
+    // public GameObject lobbyPlayer;
+    // public TMP_Text lobbyPlayer_text;
     public Button startButton;
 
 
@@ -31,7 +35,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     void Start()
     {
-        Debug.Log("Connecting to master");
         PhotonNetwork.ConnectUsingSettings();
         closeAll();
         openMenu("loading");
@@ -44,6 +47,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
         {
             return;
         }
+        PhotonNetwork.LocalPlayer.NickName = username_input.text;
         openMenu("join-select");
     }
 
@@ -58,11 +62,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
         {
             return;
         }
-        PhotonNetwork.CreateRoom(roomname_input.text);
-        openMenu("loading");
-
+        RoomOptions options = new RoomOptions(){IsOpen = true, IsVisible = true, MaxPlayers = 2};
+        PhotonNetwork.CreateRoom(roomname_input.text, options);
+        Room newRoom = Instantiate(room_prefab);
+        newRoom.gameObject.transform.SetParent(roomListMenu.transform, false);
+        newRoom.setRoomName(roomname_input.text);
+        newRoom.name = roomname_input.text;
+        roomList.Add(newRoom);
     }
-
     public void Button_joinRoomClicked()
     {  
         openMenu("roomlist");
@@ -97,7 +104,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 
     public override void OnJoinedLobby()
     {
-        Debug.Log("Joined lobby");
         if(firstLogin)
         {
             openMenu("username");
@@ -109,39 +115,84 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnCreatedRoom()
+     public void updatePlayerList()
     {
-        Button newRoom = Instantiate(room, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,90)));
-        TMP_Text newRoomText = Instantiate(roomname_text, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,-90))); 
-        newRoom.name = roomname_input.text;
-        newRoomText.text = roomname_input.text;
-        newRoom.transform.SetParent(roomList.transform, false);
-        newRoomText.transform.SetParent(newRoom.transform, false); 
-        openMenu("loading"); 
+
+        if(PhotonNetwork.CurrentRoom == null)
+        {
+            return;
+        }
+        
+        foreach(LobbyPlayer oldPlayer in playerList)
+        {
+            Destroy(oldPlayer.gameObject);
+        }
+        playerList.Clear();
+
+        foreach(KeyValuePair<int, Player> player in PhotonNetwork.CurrentRoom.Players)
+        {
+            LobbyPlayer newPlayer = Instantiate(player_prefab);
+            newPlayer.setName(player.Value.NickName);
+            newPlayer.transform.SetParent(lobby.transform, false);
+            playerList.Add(newPlayer);
+        }
     }
+
+    public override void OnPlayerEnteredRoom(Player newPlayer)
+    {
+        lobbyname_text.text = PhotonNetwork.CurrentRoom.Name;
+        updatePlayerList();
+        openMenu("lobby");    
+    }
+
+    public override void OnPlayerLeftRoom(Player old)
+    {
+        updatePlayerList();
+    }
+
     public override void OnJoinedRoom()
     {
         lobbyname_text.text = PhotonNetwork.CurrentRoom.Name;
-        GameObject newPlayer = Instantiate(lobbyPlayer, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,90)));
-        TMP_Text newPlayerText =  Instantiate(lobbyPlayer_text, new Vector2(0,0), Quaternion.Euler(new Vector3(0,0,-90))); 
-        newPlayerText.text = username_input.text;
-        newPlayer.transform.SetParent(lobby.transform, false);
-        newPlayerText.transform.SetParent(newPlayer.transform, false);
+        updatePlayerList();
         openMenu("lobby");
     }
-
-    public override void OnLeftRoom()
-    {
-        
-    }
-
-
 
     public override void OnCreateRoomFailed(short returnCode, string message)
 	{
 		error_text.text = "Creating room failed: " + message;
 		openMenu("error");
 	}
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+	{
+		error_text.text = "Joining room failed: " + message;
+		openMenu("error");
+	}
+
+
+    public override void OnRoomListUpdate(List<RoomInfo> photonRoomList)
+    {
+        //clear out room list
+        foreach(Room oldRoom in roomList)
+        {
+            Destroy(oldRoom.gameObject);
+        }
+        roomList.Clear();
+
+        //update all available rooms
+        foreach(RoomInfo room in photonRoomList)
+        {
+            if(!room.RemovedFromList)
+            {
+                Room newRoom = Instantiate(room_prefab);
+                newRoom.gameObject.transform.SetParent(roomListMenu.transform, false);
+                newRoom.setRoomName(room.Name);
+                newRoom.name = room.Name;
+                roomList.Add(newRoom);
+            }
+        }
+    }
+
 
     //menu helper functions
     public void openMenu(string name)
