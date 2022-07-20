@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.SceneManagement;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 
 public class MenuManager : MonoBehaviourPunCallbacks
 {
+    
     public static MenuManager Instance;
     public List<Menu> menus;
     public TMP_InputField username_input;
@@ -93,6 +95,14 @@ public class MenuManager : MonoBehaviourPunCallbacks
         openMenu("loading");
     }
 
+    public void Button_startGameClickec()
+    {
+        if (PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.LoadLevel("Play Level");
+        }
+    }
+
     //Photon functions
     public override void OnConnectedToMaster()
     {
@@ -129,6 +139,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
         }
         playerList.Clear();
 
+        if(PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient){
+            startButton.interactable = true;
+        }
+        else { startButton.interactable = false; }
+
         foreach(KeyValuePair<int, Player> player in PhotonNetwork.CurrentRoom.Players)
         {
             LobbyPlayer newPlayer = Instantiate(player_prefab);
@@ -142,19 +157,30 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         lobbyname_text.text = PhotonNetwork.CurrentRoom.Name;
         updatePlayerList();
-        openMenu("lobby");    
+        if(PhotonNetwork.IsMasterClient && PhotonNetwork.CurrentRoom.PlayerCount == 2)
+        {
+            startButton.interactable = true;
+        }
+        else
+        {
+            startButton.interactable = false;
+        }
+        openMenu("lobby");
+
     }
 
     public override void OnPlayerLeftRoom(Player old)
     {
         updatePlayerList();
+        startButton.interactable = false;
+
     }
 
     public override void OnJoinedRoom()
     {
         lobbyname_text.text = PhotonNetwork.CurrentRoom.Name;
         updatePlayerList();
-        openMenu("lobby");
+        openMenu("lobby"); 
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
@@ -168,7 +194,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
 		error_text.text = "Joining room failed: " + message;
 		openMenu("error");
 	}
-
 
     public override void OnRoomListUpdate(List<RoomInfo> photonRoomList)
     {
@@ -191,6 +216,12 @@ public class MenuManager : MonoBehaviourPunCallbacks
                 roomList.Add(newRoom);
             }
         }
+    }
+
+    public override void OnDisconnected(DisconnectCause cause)
+    {
+        error_text.text = "Lost connection to servers. Please restart the game";
+        openMenu("error");
     }
 
 
