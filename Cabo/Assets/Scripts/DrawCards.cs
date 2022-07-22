@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public class DrawCards : MonoBehaviour
 {
+    public static DrawCards Instance;
     public PlayerCard emptyPlayerCard;
     public EnemyCard emptyEnemyCard; 
 
@@ -13,7 +14,26 @@ public class DrawCards : MonoBehaviour
 
     public GridLayoutGroup grid;
 
-    public void OnClick()
+    void Awake()
+    {
+        Debug.Log("Enabled");
+        GameManager.gameStateChanged += OnGameStateChanged;
+    }
+
+    void OnDisable()
+    {
+        GameManager.gameStateChanged -= OnGameStateChanged;
+    }
+
+    public void OnGameStateChanged()
+    {
+        if(GameManager.Instance.currState == GameState.START)
+        {
+            FirstDistribute();
+        }
+    }
+
+    public void FirstDistribute()
     {
         for(int i=0; i<4; ++i)
         {

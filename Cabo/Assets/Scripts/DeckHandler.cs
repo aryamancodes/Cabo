@@ -14,8 +14,7 @@ public class DeckHandler: MonoBehaviour
     
     public static List<Card> deck = new List<Card>();
 
-
-    void Start()
+    void Awake()
     {
         Dictionary< Card.Suit, List<Sprite> > dict = new Dictionary< Card.Suit, List<Sprite> >();
         dict.Add(Card.Suit.Heart, heartCards);
@@ -51,6 +50,8 @@ public class DeckHandler: MonoBehaviour
         }
         System.Random rng = new System.Random();
         Shuffle(deck);
+        GameManager.Instance.setGameState(GameState.START);
+
     }
 
     //Fisher-Yates shuffle in-place
