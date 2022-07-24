@@ -8,9 +8,14 @@ public class PlayerCard : MonoBehaviour
     public Image image;
     public Card card = null;
     public Sprite back;
-    public GameObject slot;
+    public GameObject slot;    
+    public bool faceUp = false;
 
-    private Sprite face;
+    public Button button;
+
+
+
+    public Sprite face;
     private Card.Suit suit;
     private int value;
     private bool isSpecialCard;
@@ -19,7 +24,6 @@ public class PlayerCard : MonoBehaviour
     private Color startColor;
 
     
-    private bool faceUp = false;
 
     void Start()
     {

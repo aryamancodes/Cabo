@@ -96,6 +96,8 @@ MonoBehaviour:
   card: {fileID: 0}
   back: {fileID: 21300000, guid: 8bd1085a06c5848e5806cd31639b4ef2, type: 3}
   slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
+  faceUp: 0
+  button: {fileID: -9165462225293800762}
 --- !u!114 &-9165462225293800762
 MonoBehaviour:
   m_ObjectHideFlags: 0

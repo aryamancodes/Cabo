@@ -10,13 +10,15 @@ public class EnemyCard : MonoBehaviour
     public Sprite back;
     public GameObject slot;
 
+    public bool faceUp = false;
+    public Button button;
+
 
     private Sprite face;
     private Card.Suit suit;
     private int value;
     private bool isSpecialCard;
     private bool hasCard;
-    private bool faceUp = false;
 
 
      void Update()

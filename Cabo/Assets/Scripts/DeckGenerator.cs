@@ -4,7 +4,7 @@ using UnityEngine;
 using System;
 using System.Security.Cryptography;
 
-public class DeckHandler: MonoBehaviour
+public class DeckGenerator: MonoBehaviour
 {
     public List<Sprite> heartCards = new List<Sprite>();
     public List<Sprite> diamondCards = new List<Sprite>();
@@ -50,8 +50,6 @@ public class DeckHandler: MonoBehaviour
         }
         System.Random rng = new System.Random();
         Shuffle(deck);
-        GameManager.Instance.setGameState(GameState.START);
-
     }
 
     //Fisher-Yates shuffle in-place
