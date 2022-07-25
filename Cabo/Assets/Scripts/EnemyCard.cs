@@ -21,7 +21,7 @@ public class EnemyCard : MonoBehaviour
     private bool hasCard;
 
 
-     void Update()
+     void Start()
     {
         if(this.card != null && !hasCard)
         {
@@ -38,11 +38,26 @@ public class EnemyCard : MonoBehaviour
         if(faceUp)
         {
             image.sprite = back;
+            
         }
         else
         {
             image.sprite = face;
         }
         faceUp = !faceUp;
+    }
+
+    public void flipCard(string direction)
+    {
+        if(direction == "down")
+        {
+            image.sprite = back;
+            faceUp = false;
+        }
+        else if(direction == "up")
+        {
+            image.sprite = face;
+            faceUp = true;
+        }
     }
 }

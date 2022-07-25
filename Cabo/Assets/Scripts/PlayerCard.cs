@@ -49,4 +49,18 @@ public class PlayerCard : MonoBehaviour
         }
         faceUp = !faceUp;
     }
+
+    public void flipCard(string direction)
+    {
+        if(direction == "down")
+        {
+            image.sprite = back;
+            faceUp = false;
+        }
+        else if(direction == "up")
+        {
+            image.sprite = face;
+            faceUp = true;
+        }
+    }
 }

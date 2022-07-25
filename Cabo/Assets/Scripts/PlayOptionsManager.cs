@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class PlayOptionsManager : MonoBehaviour
 {
     //Display appropriate playing options - based on the currState of the GameManager
@@ -10,25 +9,19 @@ public class PlayOptionsManager : MonoBehaviour
     void Awake()
     {
         GameManager.gameStateChanged += OnGameStateChanged;
-    }
-
-    
-
-    void Start()
-    {
         hideAllOptions();
-    }
 
+    }
     void OnDisable()
     {
         GameManager.gameStateChanged -= OnGameStateChanged;
     }
 
-    public void showOption(string objname)
+    public void showOption(string name)
     {
         foreach(PlayOption option in options)
         {
-            if (option.optionName == objname)
+            if (option.optionName == name)
             {
                 option.open();
             }

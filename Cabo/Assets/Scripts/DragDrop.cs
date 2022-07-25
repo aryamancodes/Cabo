@@ -4,7 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class DragDrop : MonoBehaviour
-{    
+{        
+    private Button button;
     private GameObject canvas;
     private GameObject placeCard;
     private GameObject slot;
@@ -16,6 +17,7 @@ public class DragDrop : MonoBehaviour
 
     void Start()
     {
+        button = gameObject.GetComponent<Button>();
         canvas = GameObject.Find("Canvas");
         placeCard = GameObject.Find("Place Card");
         slot = GameObject.Find("Slot");
@@ -23,7 +25,7 @@ public class DragDrop : MonoBehaviour
      // Update is called once per frame
     void Update()
     {
-        if(isDragging)
+        if(isDragging && button.interactable)
         {
             transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             if(canvas != null)
@@ -45,40 +47,46 @@ public class DragDrop : MonoBehaviour
 
     public void startDrag()
     {
-        if(startParent == null)
+        if(button.interactable)
         {
-            startParent = transform.parent.gameObject;
+            if(startParent == null)
+            {
+                startParent = transform.parent.gameObject;
+            }
+            isDragging = true;
         }
-        isDragging = true;
     }
 
     public void stopDrag()
     {
-        isDragging = false;
-
-        if(dropZone != null)
+        if(button.interactable)
         {
-            if(dropZone.layer == UILayer) //drop in place card
+            isDragging = false;
+
+            if(dropZone != null)
             {
-                transform.position = placeCard.transform.position;
-                transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
-                transform.gameObject.layer = UILayer;
+                if(dropZone.layer == UILayer) //drop in place card
+                {
+                    transform.position = placeCard.transform.position;
+                    transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
+                    transform.gameObject.layer = UILayer;
+                }
+
+                else
+                {
+                    insertIntoArea();
+                }
             }
 
+            //return back to starting position
             else
             {
-                insertIntoArea();
+                transform.SetParent(startParent.transform, true);
+                transform.rotation = Quaternion.identity;
+
             }
+            dropZone = null;
         }
-
-        //return back to starting position
-        else
-        {
-            transform.SetParent(startParent.transform, true);
-            transform.rotation = Quaternion.identity;
-
-        }
-        dropZone = null;
     }
 
 
