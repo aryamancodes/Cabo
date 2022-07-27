@@ -148,7 +148,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 7746321002957887508}
         m_TargetAssemblyTypeName: PlayerCard, Assembly-CSharp
-        m_MethodName: flipCard
+        m_MethodName: cardClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

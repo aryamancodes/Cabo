@@ -8,20 +8,22 @@ public class EnemyCard : MonoBehaviour
     public Image image;
     public Card card = null;
     public Sprite back;
-    public GameObject slot;
-
+    public GameObject slot;    
     public bool faceUp = false;
+
     public Button button;
 
-
-    private Sprite face;
+    public Sprite face;
     private Card.Suit suit;
     private int value;
     private bool isSpecialCard;
     private bool hasCard;
 
+    private Color startColor;
 
-     void Start()
+    
+
+    void Start()
     {
         if(this.card != null && !hasCard)
         {
@@ -29,11 +31,19 @@ public class EnemyCard : MonoBehaviour
             this.suit = card.suit;
             this.value = card.value;
             this.isSpecialCard = card.isSpecialCard;
+        } 
+        if(faceUp)
+        {
+            image.sprite = face;
         }
-        
+        else
+        {
+            image.sprite = back;
+        }
+
     }
 
-     public void flipCard()
+    public void flipCard()
     {
         if(faceUp)
         {
@@ -60,4 +70,19 @@ public class EnemyCard : MonoBehaviour
             faceUp = true;
         }
     }
+
+    public void cardClicked()
+    {
+        if(GameManager.Instance.currState == GameState.START || GameManager.Instance.currState == GameState.PLAYER_READY)
+        {
+            flipCard();
+            button.interactable = false;
+            --CardHandler.enemyFlipped;
+            if(CardHandler.enemyFlipped == 0)
+            {
+                GameManager.Instance.setGameState(GameState.ENEMY_READY);
+            }   
+        }
+    }
+
 }

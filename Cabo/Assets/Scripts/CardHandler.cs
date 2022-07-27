@@ -13,6 +13,13 @@ public class CardHandler : MonoBehaviour
     public GameObject enemyArea;
 
     public Button deck; 
+
+    public static int playerFlipped = 0;
+    public static int enemyFlipped = 0;
+
+
+
+
     void Awake()
     {
         Debug.Log("Enabled");
@@ -38,17 +45,8 @@ public class CardHandler : MonoBehaviour
         {
             firstDistribute();
             setDeck(false);
-
-         }
-
-        if(GameManager.Instance.currState == GameState.PLAYER_READY)
-        {
-            flipStartingCards("player");
         }
-        if(GameManager.Instance.currState == GameState.ENEMY_READY)
-        {
-            flipStartingCards("enemy");
-        }
+ 
         if(GameManager.Instance.currState == GameState.PLAYER_TURN)
         {
             setDeck(true);
@@ -64,16 +62,15 @@ public class CardHandler : MonoBehaviour
             playerCard.card = DeckGenerator.getCard();
             playerSlot.transform.SetParent(playerArea.transform, false);
             playerCard.transform.SetParent(playerSlot.transform, false);
-            //flip 2 player cards (can't use flipCard sprite hasn't been rendered yet)
             if(i%2 == 1)
             {
-                playerCard.image.sprite = playerCard.card.face;
-                playerCard.faceUp = true;
+                playerCard.flipCard();
             }
             else
             {
                 playerCard.button.interactable = false;
             }
+            playerFlipped = 2;
             
             
             EnemyCard enemyCard = Instantiate(emptyEnemyCard, new Vector2(0,0), Quaternion.identity);
@@ -81,41 +78,18 @@ public class CardHandler : MonoBehaviour
             enemyCard.card = DeckGenerator.getCard();
             enemySlot.transform.SetParent(enemyArea.transform, false);
             enemyCard.transform.SetParent(enemySlot.transform, false);
-            //flip 2 enemy cards (can't use flipCard sprite hasn't been rendered yet)
             if(i%2 == 0)
             {
-                enemyCard.image.sprite = enemyCard.card.face;
-                enemyCard.faceUp = true;
+                enemyCard.flipCard();
             }
             else
             {
                 enemyCard.button.interactable = false;
             }
+            enemyFlipped = 2;
         }
     }
 
-    public void flipStartingCards(string who)
-    {
-        if(who == "player")
-        {
-            PlayerCard toFlip = playerArea.transform.GetChild(1).GetChild(0).gameObject.GetComponent<PlayerCard>();
-            toFlip.flipCard("down");
-            toFlip.button.interactable = false;
-            toFlip = playerArea.transform.GetChild(3).GetChild(0).gameObject.GetComponent<PlayerCard>();
-            toFlip.flipCard("down");
-            toFlip.button.interactable = false;
-
-        }
-        if(who == "enemy")
-        {
-            EnemyCard toFlip = enemyArea.transform.GetChild(0).GetChild(0).gameObject.GetComponent<EnemyCard>();
-            toFlip.flipCard("down");
-            toFlip.button.interactable = false;
-            toFlip = enemyArea.transform.GetChild(2).GetChild(0).gameObject.GetComponent<EnemyCard>();
-            toFlip.flipCard("down");
-            toFlip.button.interactable = false;
-        }
-    }
 
     public void Button_onDrawCard()
     {
@@ -139,7 +113,12 @@ public class CardHandler : MonoBehaviour
     public void insertDrawnCard(GameObject area, GameObject slot, PlayerCard playerCard=null, EnemyCard enemyCard=null)
     {
         Transform card;
-        if(playerCard != null) { card = playerCard.transform; }
+        if(playerCard != null) 
+        {
+            card = playerCard.transform; 
+            playerCard.flipCard();
+
+        }
         else { card = enemyCard.transform; }
         //insert into existing slot
         foreach(Transform child in area.transform)

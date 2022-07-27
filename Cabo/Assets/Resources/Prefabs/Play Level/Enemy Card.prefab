@@ -100,6 +100,7 @@ MonoBehaviour:
   slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
   faceUp: 0
   button: {fileID: -9165462225293800762}
+  face: {fileID: 0}
 --- !u!114 &-9165462225293800762
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -146,7 +147,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: -8825698727873679524}
         m_TargetAssemblyTypeName: EnemyCard, Assembly-CSharp
-        m_MethodName: flipCard
+        m_MethodName: cardClicked
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

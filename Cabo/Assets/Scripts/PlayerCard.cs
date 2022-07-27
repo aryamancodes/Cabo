@@ -13,8 +13,6 @@ public class PlayerCard : MonoBehaviour
 
     public Button button;
 
-
-
     public Sprite face;
     private Card.Suit suit;
     private int value;
@@ -34,6 +32,15 @@ public class PlayerCard : MonoBehaviour
             this.value = card.value;
             this.isSpecialCard = card.isSpecialCard;
         } 
+        if(faceUp)
+        {
+            image.sprite = face;
+        }
+        else
+        {
+            image.sprite = back;
+        }
+
     }
 
     public void flipCard()
@@ -63,4 +70,19 @@ public class PlayerCard : MonoBehaviour
             faceUp = true;
         }
     }
+
+    public void cardClicked()
+    {
+        if(GameManager.Instance.currState == GameState.START || GameManager.Instance.currState == GameState.ENEMY_READY)
+        {
+            flipCard();
+            button.interactable = false;
+            --CardHandler.playerFlipped;
+            if(CardHandler.playerFlipped == 0)
+            {
+                GameManager.Instance.setGameState(GameState.PLAYER_READY);
+            }   
+        }
+    }
+
 }

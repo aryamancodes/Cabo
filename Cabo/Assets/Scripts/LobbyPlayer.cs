@@ -21,11 +21,4 @@ public class LobbyPlayer : MonoBehaviourPunCallbacks
         Destroy(gameObject);
     }
 
-    // public override void OnPlayerLeftRoom(Player otherPlayer)
-	// {
-	// 	if(player == otherPlayer)
-	// 	{
-	// 		Destroy(gameObject);
-	// 	}
-	// }
 }
