@@ -2,7 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum GameState{ START, PLAYER_READY, ENEMY_READY, PLAYER_TURN, ENEMY_TURN, ALL_TURN, BLINDSWAP, SWAP, PEAK, PLAY, CABO, GAME_OVER, REPLAY_NORMAL, REPLAY_FALSE_CABO, PAUSE, QUIT, NONE }
+public enum GameState{ START, PLAYER_READY, PLAYER_DRAW, PLAYER_TURN, PLAYER_PLACE,
+                        ENEMY_READY, ENEMY_DRAW, ENEMY_TURN, ENEMY_PLACE, ALL_TURN, 
+                        BLINDSWAP, SWAP, PEAK, PLAY, CABO, 
+                        GAME_OVER, REPLAY_NORMAL, REPLAY_FALSE_CABO, PAUSE, QUIT, NONE }
 
 public class GameManager : MonoBehaviour
 {

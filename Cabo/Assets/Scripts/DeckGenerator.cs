@@ -12,25 +12,25 @@ public class DeckGenerator: MonoBehaviour
     public List<Sprite> clubCards = new List<Sprite>();
     public List<Sprite> jokers = new List<Sprite>(); 
     
-    public static List<Card> deck = new List<Card>();
+    public static List<CardBase> deck = new List<CardBase>();
 
     void Awake()
     {
-        Dictionary< Card.Suit, List<Sprite> > dict = new Dictionary< Card.Suit, List<Sprite> >();
-        dict.Add(Card.Suit.Heart, heartCards);
-        dict.Add(Card.Suit.Diamond, diamondCards);
-        dict.Add(Card.Suit.Spade, spadeCards);
-        dict.Add(Card.Suit.Club, clubCards);
-        dict.Add(Card.Suit.Joker, jokers);
+        Dictionary< CardBase.Suit, List<Sprite> > dict = new Dictionary< CardBase.Suit, List<Sprite> >();
+        dict.Add(CardBase.Suit.Heart, heartCards);
+        dict.Add(CardBase.Suit.Diamond, diamondCards);
+        dict.Add(CardBase.Suit.Spade, spadeCards);
+        dict.Add(CardBase.Suit.Club, clubCards);
+        dict.Add(CardBase.Suit.Joker, jokers);
         
 
-        foreach(Card.Suit suit in Enum.GetValues(typeof(Card.Suit)))
+        foreach(CardBase.Suit suit in Enum.GetValues(typeof(CardBase.Suit)))
         {
             
-            if(suit == Card.Suit.Joker)
+            if(suit == CardBase.Suit.Joker)
             {
-                deck.Add(Card.CreateInstance(dict[Card.Suit.Joker][0], -1, Card.Suit.Joker, true));
-                deck.Add(Card.CreateInstance(dict[Card.Suit.Joker][1], -1, Card.Suit.Joker, true));
+                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][0], -1, CardBase.Suit.Joker, true));
+                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][1], -1, CardBase.Suit.Joker, true));
                 continue;
             }
 
@@ -39,13 +39,13 @@ public class DeckGenerator: MonoBehaviour
                 bool special = i>6 || i==0; //special cases for all cards greater than 7 and aces
 
                 //red kings have a special value
-                if(i == 12 && (suit == Card.Suit.Heart || suit == Card.Suit.Diamond))
+                if(i == 12 && (suit == CardBase.Suit.Heart || suit == CardBase.Suit.Diamond))
                 {
-                    deck.Add(Card.CreateInstance(dict[suit][i], 0, suit, true));
+                    deck.Add(CardBase.CreateInstance(dict[suit][i], 0, suit, true));
                     continue;
                 }
 
-                deck.Add(Card.CreateInstance(dict[suit][i], i+1, suit, special));
+                deck.Add(CardBase.CreateInstance(dict[suit][i], i+1, suit, special));
             }
         }
         System.Random rng = new System.Random();
@@ -53,7 +53,7 @@ public class DeckGenerator: MonoBehaviour
     }
 
     //Fisher-Yates shuffle in-place
-    void Shuffle(List<Card> list)
+    void Shuffle(List<CardBase> list)
     {
         RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
         int n = list.Count;
@@ -70,7 +70,7 @@ public class DeckGenerator: MonoBehaviour
         }
     }
 
-    public static Card getCard()
+    public static CardBase getCard()
     {
         var card = deck[0];
         deck.RemoveAt(0);

@@ -18,8 +18,8 @@ GameObject:
   - component: {fileID: -7763341921091130729}
   - component: {fileID: -7523415434540078743}
   - component: {fileID: -4406760889487829736}
-  m_Layer: 7
-  m_Name: Player Card
+  m_Layer: 5
+  m_Name: Card
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96,12 +96,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   image: {fileID: 5810423015560917803}
-  card: {fileID: 0}
-  back: {fileID: 21300000, guid: 05568b408f8c74149948e47a0a6c6cbd, type: 3}
+  card: {fileID: 11400000, guid: 56ddf5e9f3bfc40d5be6e3c6f408c49a, type: 2}
+  back: {fileID: 21300000, guid: 230fc61a1b1bf4671ad7e096b2e551a7, type: 3}
   slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
   faceUp: 0
   button: {fileID: 7049321018006798974}
   face: {fileID: 0}
+  suit: 0
+  value: 0
+  isSpecialCard: 0
+  isPlayerCard: 0
 --- !u!114 &7049321018006798974
 MonoBehaviour:
   m_ObjectHideFlags: 0

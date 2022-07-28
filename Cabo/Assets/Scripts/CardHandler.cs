@@ -6,19 +6,17 @@ using UnityEngine.UI;
 public class CardHandler : MonoBehaviour
 {
     //handle the distributing of cards - based on currGameState of the GameManager
-    public PlayerCard emptyPlayerCard;
-    public EnemyCard emptyEnemyCard; 
+    public Card emptyCard;
+    public Sprite playerBack;
+    public Sprite enemyBack;
 
     public GameObject playerArea;
     public GameObject enemyArea;
+    public GameObject placeArea;
 
     public Button deck; 
-
     public static int playerFlipped = 0;
     public static int enemyFlipped = 0;
-
-
-
 
     void Awake()
     {
@@ -34,32 +32,36 @@ public class CardHandler : MonoBehaviour
         GameManager.gameStateChanged -= OnGameStateChanged;
     }
 
-    void setDeck(bool val)
-    {
-        deck.interactable = val;
-    }
 
     public void OnGameStateChanged()
     {
-        if(GameManager.Instance.currState == GameState.START)
+        var currState = GameManager.Instance.currState;
+        var prevState = GameManager.Instance.prevState;
+        if(currState == GameState.START)
         {
             firstDistribute();
-            setDeck(false);
+            setDrawCards(false);
         }
  
-        if(GameManager.Instance.currState == GameState.PLAYER_TURN)
+        if(currState == GameState.PLAYER_DRAW)
         {
-            setDeck(true);
+            setDrawCards(true);
         }
+        if(currState == GameState.PLAYER_TURN)
+        {
+            setPlayerDrag(true);
+        }
+
     }
 
     public void firstDistribute()
     {
         for(int i=0; i<4; ++i)
         {
-            PlayerCard playerCard = Instantiate(emptyPlayerCard, new Vector2(0,0), Quaternion.identity);
+            Card playerCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject playerSlot = Instantiate(playerCard.slot, new Vector2(0,0), Quaternion.identity);
             playerCard.card = DeckGenerator.getCard();
+            playerCard.back = playerBack;
             playerSlot.transform.SetParent(playerArea.transform, false);
             playerCard.transform.SetParent(playerSlot.transform, false);
             if(i%2 == 1)
@@ -73,9 +75,10 @@ public class CardHandler : MonoBehaviour
             playerFlipped = 2;
             
             
-            EnemyCard enemyCard = Instantiate(emptyEnemyCard, new Vector2(0,0), Quaternion.identity);
+            Card enemyCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject enemySlot = Instantiate(enemyCard.slot, new Vector2(0,0), Quaternion.identity);
             enemyCard.card = DeckGenerator.getCard();
+            enemyCard.back = enemyBack;
             enemySlot.transform.SetParent(enemyArea.transform, false);
             enemyCard.transform.SetParent(enemySlot.transform, false);
             if(i%2 == 0)
@@ -90,27 +93,26 @@ public class CardHandler : MonoBehaviour
         }
     }
 
-
     public void Button_onDrawCard()
     {
-        if(GameManager.Instance.currState == GameState.PLAYER_TURN)
+        Card drawnCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
+        GameObject slot = Instantiate(emptyCard.slot, new Vector2(0,0), Quaternion.identity); 
+        drawnCard.card = DeckGenerator.getCard();
+        if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
         {
-            PlayerCard drawnCard = Instantiate(emptyPlayerCard, new Vector2(0,0), Quaternion.identity);
-            GameObject slot = Instantiate(emptyPlayerCard.slot, new Vector2(0,0), Quaternion.identity); 
-            drawnCard.card = DeckGenerator.getCard();
+            drawnCard.back = playerBack;
             insertDrawnCard(playerArea, slot, drawnCard);
-            GameManager.Instance.setGameState(GameState.ENEMY_TURN);
+            playerFlipped++;
         }
-        else if(GameManager.Instance.currState == GameState.ENEMY_TURN)
+        else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
         {
-            EnemyCard drawnCard = Instantiate(emptyEnemyCard, new Vector2(0,0), Quaternion.identity);
-            GameObject slot = Instantiate(emptyEnemyCard.slot, new Vector2(0,0), Quaternion.identity);
-            drawnCard.card = DeckGenerator.getCard();
+            drawnCard.back = enemyBack;
+            enemyFlipped++;
             insertDrawnCard(enemyArea, slot, null,drawnCard);
         }
     }
 
-    public void insertDrawnCard(GameObject area, GameObject slot, PlayerCard playerCard=null, EnemyCard enemyCard=null)
+    public void insertDrawnCard(GameObject area, GameObject slot, Card playerCard=null, Card enemyCard=null)
     {
         Transform card;
         if(playerCard != null) 
@@ -138,6 +140,31 @@ public class CardHandler : MonoBehaviour
         slot.transform.SetParent(area.transform, false);
         card.SetParent(slot.transform, false);
         card.gameObject.layer = area.layer;
-
     }
+
+     void setDrawCards(bool val)
+    {
+        deck.interactable = val;
+        foreach(Transform child in placeArea.transform)
+        {
+            
+        }
+    }
+
+    public void setPlayerDrag(bool val)
+    {
+        foreach(Transform child in playerArea.transform)
+        {
+            if(child.childCount == 0)
+            {
+                continue;
+            }
+            else
+            {
+                child.GetChild(0).GetComponent<Card>().button.interactable = val;
+            }
+        }
+    }
+
+
 }

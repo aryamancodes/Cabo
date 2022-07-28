@@ -47,6 +47,7 @@ public class DragDrop : MonoBehaviour
 
     public void startDrag()
     {
+        var currState = GameManager.Instance.currState;
         if(button.interactable)
         {
             if(startParent == null)
@@ -65,11 +66,13 @@ public class DragDrop : MonoBehaviour
 
             if(dropZone != null)
             {
-                if(dropZone.layer == UILayer) //drop in place card
+                if(dropZone.layer == UILayer) //drop card
                 {
                     transform.position = placeCard.transform.position;
                     transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
                     transform.gameObject.layer = UILayer;
+                    transform.SetParent(placeCard.transform);
+                    transform.gameObject.GetComponent<Card>().flipCard("up");
                 }
 
                 else
