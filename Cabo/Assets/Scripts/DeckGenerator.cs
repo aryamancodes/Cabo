@@ -36,12 +36,12 @@ public class DeckGenerator: MonoBehaviour
 
             for(int i=0; i<13; ++i)
             {
-                bool special = i>6 || i==0; //special cases for all cards greater than 7 and aces
+                bool special = i>6 || i==0; //special cases for all cards greater than 7 and aces except red kings
 
-                //red kings have a special value
+                //red kings have a special value but aren't special card when played
                 if(i == 12 && (suit == CardBase.Suit.Heart || suit == CardBase.Suit.Diamond))
                 {
-                    deck.Add(CardBase.CreateInstance(dict[suit][i], 0, suit, true));
+                    deck.Add(CardBase.CreateInstance(dict[suit][i], 0, suit, false));
                     continue;
                 }
 

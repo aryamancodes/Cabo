@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class CardHandler : MonoBehaviour
 {
     //handle the distributing of cards - based on currGameState of the GameManager
+    public static CardHandler Instance;
     public Card emptyCard;
     public Sprite playerBack;
     public Sprite enemyBack;
@@ -22,7 +23,8 @@ public class CardHandler : MonoBehaviour
     {
         Debug.Log("Enabled");
         GameManager.gameStateChanged += OnGameStateChanged;
-
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
         //GameManager.Instance.setGameState(GameState.START);
 
     }
@@ -43,13 +45,27 @@ public class CardHandler : MonoBehaviour
             setDrawCards(false);
         }
  
-        if(currState == GameState.PLAYER_DRAW)
+        if(currState == GameState.PLAYER_DRAW || currState == GameState.ENEMY_DRAW)
         {
             setDrawCards(true);
         }
+
         if(currState == GameState.PLAYER_TURN)
         {
             setPlayerDrag(true);
+        }
+        if(currState == GameState.PLAYER_DRAW)
+        {
+           setEnemyDrag(false); 
+        }
+        if(currState == GameState.ENEMY_DRAW)
+        {
+           setPlayerDrag(false); 
+        }
+
+        if(currState == GameState.ENEMY_TURN)
+        {
+            setEnemyDrag(true);
         }
 
     }
@@ -64,8 +80,10 @@ public class CardHandler : MonoBehaviour
             playerCard.back = playerBack;
             playerSlot.transform.SetParent(playerArea.transform, false);
             playerCard.transform.SetParent(playerSlot.transform, false);
+            playerCard.gameObject.layer = playerArea.layer;
             if(i%2 == 1)
             {
+                playerCard.card.isSpecialCard  = false; //first peaked cards are not special
                 playerCard.flipCard();
             }
             else
@@ -81,8 +99,10 @@ public class CardHandler : MonoBehaviour
             enemyCard.back = enemyBack;
             enemySlot.transform.SetParent(enemyArea.transform, false);
             enemyCard.transform.SetParent(enemySlot.transform, false);
+            enemyCard.gameObject.layer = enemyArea.layer;
             if(i%2 == 0)
             {
+               enemyCard.card.isSpecialCard  = false; //first peaked cards are not special
                 enemyCard.flipCard();
             }
             else
@@ -110,6 +130,7 @@ public class CardHandler : MonoBehaviour
             enemyFlipped++;
             insertDrawnCard(enemyArea, slot, null,drawnCard);
         }
+        setDrawCards(false);
     }
 
     public void insertDrawnCard(GameObject area, GameObject slot, Card playerCard=null, Card enemyCard=null)
@@ -121,7 +142,11 @@ public class CardHandler : MonoBehaviour
             playerCard.flipCard();
 
         }
-        else { card = enemyCard.transform; }
+        else 
+        { 
+            card = enemyCard.transform;
+            enemyCard.flipCard();
+        }
         //insert into existing slot
         foreach(Transform child in area.transform)
         {
@@ -147,7 +172,7 @@ public class CardHandler : MonoBehaviour
         deck.interactable = val;
         foreach(Transform child in placeArea.transform)
         {
-            
+            child.GetComponent<Card>().button.interactable = val;
         }
     }
 
@@ -166,5 +191,31 @@ public class CardHandler : MonoBehaviour
         }
     }
 
+    public void setEnemyDrag(bool val)
+    {
+        foreach(Transform child in enemyArea.transform)
+        {
+            if(child.childCount == 0)
+            {
+                continue;
+            }
+            else
+            {
+                child.GetChild(0).GetComponent<Card>().button.interactable = val;
+            }
+        }
+    }
+
+    public void cardPlayed(Card card)
+    {
+        if(card.isSpecialCard)
+        {
+            GameManager.Instance.setGameState(GameState.SPECIAL_PLAY);
+        }
+        else
+        {
+            GameManager.Instance.setGameState(GameState.PLAY);
+        }   
+    }
 
 }

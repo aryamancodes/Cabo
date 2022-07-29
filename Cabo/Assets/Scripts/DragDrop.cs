@@ -12,7 +12,7 @@ public class DragDrop : MonoBehaviour
     private GameObject startParent = null;
     private bool isDragging = false; 
     private GameObject dropZone = null;
-    private int UILayer = 5;
+    private int UILayer;
 
 
     void Start()
@@ -66,13 +66,15 @@ public class DragDrop : MonoBehaviour
 
             if(dropZone != null)
             {
-                if(dropZone.layer == UILayer) //drop card
+                if(dropZone.layer == GameManager.Instance.UILayer) //drop card into center
                 {
                     transform.position = placeCard.transform.position;
                     transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
-                    transform.gameObject.layer = UILayer;
+                    transform.gameObject.layer = dropZone.layer;
                     transform.SetParent(placeCard.transform);
-                    transform.gameObject.GetComponent<Card>().flipCard("up");
+                    Card played = transform.gameObject.GetComponent<Card>();
+                    played.flipCard("up");
+                    CardHandler.Instance.cardPlayed(played);
                 }
 
                 else
@@ -96,6 +98,10 @@ public class DragDrop : MonoBehaviour
     //dropping in enemy's grid layout group
     void insertIntoArea()
     {
+        if(startParent.layer == GameManager.Instance.UILayer)
+        {
+            CardHandler.Instance.setPlayerDrag(false);
+        }
         //replace a previously moved card
         foreach(Transform child in dropZone.transform)
             {

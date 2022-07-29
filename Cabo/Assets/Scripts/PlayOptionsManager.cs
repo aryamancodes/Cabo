@@ -70,12 +70,25 @@ public class PlayOptionsManager : MonoBehaviour
 
         if(currState == GameState.PLAYER_DRAW)
         {
-            player_hint.Text .text = "Draw a card or drag a previously played card in your area. Clik the flipped card when you're ready!";
+            player_hint.Text.text = "Draw a card or drag a previously played card in your area. Click the flipped card when you're ready!";
+            enemy_hint.Text.text = "Waiting for opponent to draw card!";
         }
 
         if(currState == GameState.PLAYER_TURN)
         {
             player_hint.Text.text = "Place a card in the middle to play!";
+            enemy_hint.Text.text = "Waiting for opponent to play a card!";
+
+        }
+
+        if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
+        {
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                player_hint.Text.text = "Don't forget to end turn!";
+                enemy_hint.Text.text = "Waiting for enemy to end turn!";
+            }
+            showOption("end_turn");
         }
     }
 

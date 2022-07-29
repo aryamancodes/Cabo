@@ -12,14 +12,11 @@ public class Card : MonoBehaviour
     public bool faceUp = false;
 
     public Button button;
-
     public Sprite face;
     public CardBase.Suit suit;
     public int value;
     public bool isSpecialCard;
-    public bool isPlayerCard; 
 
-    
 
     void Start()
     {
@@ -71,6 +68,21 @@ public class Card : MonoBehaviour
 
     public void cardClicked()
     {
+        if(gameObject.layer == GameManager.Instance.playerLayer)
+        {
+            playerCardClicked();
+        }
+        if(gameObject.layer == GameManager.Instance.enemyLayer)
+        {
+            enemyCardClicked();
+        }
+    }
+
+
+
+
+    public void playerCardClicked()
+    {
         var currState = GameManager.Instance.currState;
         switch(currState)
         {
@@ -104,6 +116,47 @@ public class Card : MonoBehaviour
                 if(CardHandler.playerFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.PLAYER_TURN);
+                }
+                break;
+            }
+        }
+    }
+
+    public void enemyCardClicked()
+    {
+        var currState = GameManager.Instance.currState;
+        switch(currState)
+        {
+            case GameState.START:
+            {
+                flipCard();
+                button.interactable = false;
+                --CardHandler.enemyFlipped;
+                if(CardHandler.enemyFlipped == 0)
+                {
+                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                }   
+                break;
+            }
+            case GameState.PLAYER_READY:
+            {
+                flipCard();
+                button.interactable = false;
+                --CardHandler.enemyFlipped;
+                if(CardHandler.enemyFlipped == 0)
+                {
+                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                }
+                break;
+            }
+            case GameState.ENEMY_DRAW:
+            {
+                flipCard();
+                button.interactable = false;
+                --CardHandler.enemyFlipped;
+                if(CardHandler.enemyFlipped == 0)
+                {
+                    GameManager.Instance.setGameState(GameState.ENEMY_TURN);
                 }
                 break;
             }
