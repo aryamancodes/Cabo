@@ -7,6 +7,20 @@ public class PlayOptionsManager : MonoBehaviour
     //Play options are both text hints to the players and action buttons for special cards
     public List<PlayOption> options;
 
+
+    //dictionary of hints of the form currState -> {active player hint, waiting player hint}
+    Dictionary<GameState, List<string>> dict = new Dictionary<GameState, List<string>>()
+    {
+        { GameState.START, new List<string>{"Click on the flipped cards when you're ready!", "Click on the flipped cards when you're ready!"} },
+        { GameState.PLAYER_READY, new List<string>{"Waiting for opponent!", "Click on the flipped cards when you're ready!"} },
+        { GameState.PLAYER_DRAW, new List<string>{"Draw a card or drag a previously played card in your area. Click the flipped card when you're ready!"
+                                                , "Waiting for opponent to draw card!"} },
+
+        { GameState.PLAYER_TURN, new List<string>{"Place a card in the middle to play!", "Waiting for opponent to play a card!"} },
+        { GameState.PLAY, new List<string>{"Don't forget to end turn!", "Waiting for opponent to end turn!"} },
+        { GameState.SPECIAL_PLAY, new List<string>{"Don't forget to end turn!", "Waiting for opponent to end turn!"} },
+    };
+
     void Awake()
     {
         GameManager.gameStateChanged += OnGameStateChanged;
@@ -47,13 +61,12 @@ public class PlayOptionsManager : MonoBehaviour
         var prevState = GameManager.Instance.prevState;
         if(currState == GameState.START)
         {
-            string hint = "Click on the flipped cards when you're ready!";
-            player_hint.Text.text = hint;
-            enemy_hint.Text.text = hint;
+            player_hint.Text.text = dict[currState][0];
+            enemy_hint.Text.text = dict[currState][0];
         }
         if(currState == GameState.PLAYER_READY)
         {
-            player_hint.Text.text = "Waiting for opponent!";
+            player_hint.Text.text = dict[currState][0];
             if(prevState == GameState.ENEMY_READY)
             {
                 GameManager.Instance.setGameState(GameState.PLAYER_DRAW);
@@ -61,38 +74,52 @@ public class PlayOptionsManager : MonoBehaviour
         }
         if(currState == GameState.ENEMY_READY)
         {
-            enemy_hint.Text.text = "Waiting for opponent!";
+            enemy_hint.Text.text = dict[GameState.PLAYER_READY][0];
             if(prevState == GameState.PLAYER_READY)
             {
                 GameManager.Instance.setGameState(GameState.PLAYER_DRAW);
             }
         }
 
-        if(currState == GameState.PLAYER_DRAW)
+         if(currState == GameState.PLAYER_DRAW)
         {
-            player_hint.Text.text = "Draw a card or drag a previously played card in your area. Click the flipped card when you're ready!";
-            enemy_hint.Text.text = "Waiting for opponent to draw card!";
+            player_hint.Text.text = dict[currState][0];
+            enemy_hint.Text.text = dict[currState][1];
         }
+        if(currState == GameState.ENEMY_DRAW)
+        {
+            player_hint.Text.text = dict[GameState.PLAYER_DRAW][1];
+            enemy_hint.Text.text = dict[GameState.PLAYER_DRAW][0];
+        }
+
 
         if(currState == GameState.PLAYER_TURN)
         {
-            player_hint.Text.text = "Place a card in the middle to play!";
-            enemy_hint.Text.text = "Waiting for opponent to play a card!";
-
+            player_hint.Text.text = dict[currState][0];
+            enemy_hint.Text.text = dict[currState][1];
         }
+
+        if(currState == GameState.ENEMY_TURN)
+        {
+            player_hint.Text.text = dict[GameState.PLAYER_TURN][1];
+            enemy_hint.Text.text = dict[GameState.PLAYER_TURN][0];
+        }
+
 
         if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
         {
             if(prevState == GameState.PLAYER_TURN)
             {
-                player_hint.Text.text = "Don't forget to end turn!";
-                enemy_hint.Text.text = "Waiting for enemy to end turn!";
+                player_hint.Text.text = dict[currState][0];
+                enemy_hint.Text.text = dict[currState][1];
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                player_hint.Text.text = dict[currState][1];
+                enemy_hint.Text.text = dict[currState][0]; 
             }
             showOption("end_turn");
         }
     }
-
-
-
 
 }
