@@ -4,7 +4,7 @@ using UnityEngine;
 
 public enum GameState{ START, PLAYER_READY, PLAYER_DRAW, PLAYER_TURN,
                         ENEMY_READY, ENEMY_DRAW, ENEMY_TURN, ALL_TURN, 
-                        BLINDSWAP, SWAP, PEAK, PLAY, SPECIAL_PLAY, CABO, 
+                        BLIND_SWAP1, BLIND_SWAP2, SWAP1, SWAP2, PEAK_PLAYER, PEAK_ENEMY, PLAY, SPECIAL_PLAY, CABO, 
                         GAME_OVER, REPLAY_NORMAL, REPLAY_FALSE_CABO, PAUSE, QUIT, NONE }
 
 public class GameManager : MonoBehaviour
@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
     }
 
     //set the current state of the FSM. Optionally set the prev state without sending event to subsrcibers
-    //This is useful to determine which player placed a card during the ALL_TURN stage
+    //This is useful to determine which player placed a card, for example during the ALL_TURN stage
     public void setGameState(GameState newState, GameState prev=GameState.NONE)
     {
         Debug.Log("NEW GAME STATE " + newState);

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class DragDrop : MonoBehaviour
 {        
-    private Button button;
+    private Card card;
     private GameObject canvas;
     private GameObject placeCard;
     private GameObject slot;
@@ -17,7 +17,7 @@ public class DragDrop : MonoBehaviour
 
     void Start()
     {
-        button = gameObject.GetComponent<Button>();
+        card = gameObject.GetComponent<Card>();
         canvas = GameObject.Find("Canvas");
         placeCard = GameObject.Find("Place Card");
         slot = GameObject.Find("Slot");
@@ -25,7 +25,7 @@ public class DragDrop : MonoBehaviour
      // Update is called once per frame
     void Update()
     {
-        if(isDragging && button.interactable)
+        if(isDragging && card.canDrag)
         {
             transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
             if(canvas != null)
@@ -48,7 +48,7 @@ public class DragDrop : MonoBehaviour
     public void startDrag()
     {
         var currState = GameManager.Instance.currState;
-        if(button.interactable)
+        if(card.canDrag)
         {
             if(startParent == null)
             {
@@ -60,7 +60,7 @@ public class DragDrop : MonoBehaviour
 
     public void stopDrag()
     {
-        if(button.interactable)
+        if(card.canDrag)
         {
             isDragging = false;
 
@@ -75,6 +75,16 @@ public class DragDrop : MonoBehaviour
                     Card played = transform.gameObject.GetComponent<Card>();
                     played.flipCard("up");
                     CardHandler.Instance.cardPlayed(played);
+                    CardHandler.Instance.setDrawCards(false);
+                    if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
+                    {
+                        CardHandler.Instance.setPlayerClickAndDrag(false, false);
+                    }
+                    else if(GameManager.Instance.prevState == GameState.ENEMY_TURN)
+                    {
+                        CardHandler.Instance.setEnemyClickAndDrag(false, false);
+
+                    }
                 }
 
                 else
@@ -100,7 +110,7 @@ public class DragDrop : MonoBehaviour
     {
         if(startParent.layer == GameManager.Instance.UILayer)
         {
-            CardHandler.Instance.setPlayerDrag(false);
+            CardHandler.Instance.setPlayerClickAndDrag(false, false);
         }
         //replace a previously moved card
         foreach(Transform child in dropZone.transform)

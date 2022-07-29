@@ -29,14 +29,14 @@ public class DeckGenerator: MonoBehaviour
             
             if(suit == CardBase.Suit.Joker)
             {
-                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][0], -1, CardBase.Suit.Joker, true));
-                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][1], -1, CardBase.Suit.Joker, true));
+                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][0], -1, CardBase.Suit.Joker, false));
+                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][1], -1, CardBase.Suit.Joker, false));
                 continue;
             }
 
             for(int i=0; i<13; ++i)
             {
-                bool special = i>6 || i==0; //special cases for all cards greater than 7 and aces except red kings
+                bool special = i>=6; //special cases for all cards greater than 7 except red kings
 
                 //red kings have a special value but aren't special card when played
                 if(i == 12 && (suit == CardBase.Suit.Heart || suit == CardBase.Suit.Diamond))

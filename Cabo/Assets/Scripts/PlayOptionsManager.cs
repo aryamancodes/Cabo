@@ -18,7 +18,14 @@ public class PlayOptionsManager : MonoBehaviour
 
         { GameState.PLAYER_TURN, new List<string>{"Place a card in the middle to play!", "Waiting for opponent to play a card!"} },
         { GameState.PLAY, new List<string>{"Don't forget to end turn!", "Waiting for opponent to end turn!"} },
-        { GameState.SPECIAL_PLAY, new List<string>{"Don't forget to end turn!", "Waiting for opponent to end turn!"} },
+        { GameState.SPECIAL_PLAY, new List<string>{"Select a special option or end turn!", "Waiting for opponent to end turn!"} },
+        { GameState.PEAK_PLAYER, new List<string>{"Select one of the available cards to peak!", "Waiting for opponent to peak!"} },
+        { GameState.PEAK_ENEMY, new List<string>{"Select one of the available cards to peak!", "Waiting for opponent to peak!"} },
+        { GameState.BLIND_SWAP1, new List<string>{"Select one of your cards to swap!", "Waiting for opponent to swap cards!"} },
+        { GameState.BLIND_SWAP2, new List<string>{"Select one of the opponent's cards to swap!", "Waiting for opponent to swap cards!"} },
+        { GameState.SWAP1, new List<string>{"Select one of your cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
+        { GameState.SWAP2, new List<string>{"Select one of the opponent's cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
+
     };
 
     void Awake()
@@ -55,6 +62,7 @@ public class PlayOptionsManager : MonoBehaviour
 
     public void OnGameStateChanged()
     {
+        hideAllOptions();
         PlayOption player_hint = showOption("player_text");
         PlayOption enemy_hint = showOption("enemy_text");
         var currState = GameManager.Instance.currState;
@@ -120,6 +128,43 @@ public class PlayOptionsManager : MonoBehaviour
             }
             showOption("end_turn");
         }
-    }
 
+        if(currState == GameState.SPECIAL_PLAY)
+        {
+            int value = CardHandler.Instance.played.card.value;
+
+            if(value == 7 || value == 8)
+            {
+                showOption("peak_player");
+            }
+            if(value == 9 || value == 10)
+            {
+                showOption("peak_enemy");
+            }
+            if(value == 11 || value == 12)
+            {
+                showOption("blind_swap");
+            }
+            if(value == 13)
+            {
+                showOption("swap");
+            }
+        }
+
+        if(currState == GameState.PEAK_PLAYER || currState == GameState.PEAK_ENEMY || currState == GameState.SWAP1 || currState == GameState.SWAP2
+        || currState == GameState.BLIND_SWAP1 || currState == GameState.BLIND_SWAP2)
+        {
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                player_hint.Text.text = dict[currState][0];
+                enemy_hint.Text.text = dict[currState][1];
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                player_hint.Text.text = dict[currState][1];
+                enemy_hint.Text.text = dict[currState][0];
+            }
+        }
+
+    }
 }

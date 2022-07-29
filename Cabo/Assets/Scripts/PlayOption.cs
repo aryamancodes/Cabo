@@ -6,11 +6,15 @@ using TMPro;
 public class PlayOption : MonoBehaviour
 {
     public string optionName;
-    public Button button;
-    public TMP_Text Text;
+    public Button button = null;
+    public TMP_Text Text = null;
     public void open()
     {
         gameObject.SetActive(true);
+        if(button != null)
+        {
+            button.interactable = true;
+        }
     }
 
     public void close()
@@ -29,6 +33,8 @@ public class PlayOption : MonoBehaviour
      //Handle the onClick event
     public void Button_click()
     {
+        GameState prev = GameManager.Instance.prevState;
+        button.interactable = false;
         if(optionName == "end_turn")
         {
             if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
@@ -39,6 +45,23 @@ public class PlayOption : MonoBehaviour
             {
                 GameManager.Instance.setGameState(GameState.PLAYER_DRAW);
             }
+        }
+        if(optionName == "blind_swap")
+        {
+            GameManager.Instance.setGameState(GameState.BLIND_SWAP1, prev);
+        }
+
+        if(optionName == "swap")
+        {
+            GameManager.Instance.setGameState(GameState.SWAP1, prev);
+        }
+        if(optionName == "peak_player")
+        {
+            GameManager.Instance.setGameState(GameState.PEAK_PLAYER, prev);
+        }
+        if(optionName == "peak_enemy")
+        {
+            GameManager.Instance.setGameState(GameState.PEAK_ENEMY, prev);
         }
     }
 }

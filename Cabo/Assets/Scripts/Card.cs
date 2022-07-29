@@ -16,6 +16,7 @@ public class Card : MonoBehaviour
     public CardBase.Suit suit;
     public int value;
     public bool isSpecialCard;
+    public bool canDrag = false;
 
 
     void Start()
@@ -84,14 +85,15 @@ public class Card : MonoBehaviour
     public void playerCardClicked()
     {
         var currState = GameManager.Instance.currState;
+        var prevState=  GameManager.Instance.prevState;
         switch(currState)
         {
             case GameState.START:
             {
                 flipCard();
                 button.interactable = false;
-                --CardHandler.playerFlipped;
-                if(CardHandler.playerFlipped == 0)
+                --CardHandler.Instance.playerFlipped;
+                if(CardHandler.Instance.playerFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.PLAYER_READY);
                 }   
@@ -101,8 +103,8 @@ public class Card : MonoBehaviour
             {
                 flipCard();
                 button.interactable = false;
-                --CardHandler.playerFlipped;
-                if(CardHandler.playerFlipped == 0)
+                --CardHandler.Instance.playerFlipped;
+                if(CardHandler.Instance.playerFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.PLAYER_READY);
                 }
@@ -112,11 +114,20 @@ public class Card : MonoBehaviour
             {
                 flipCard();
                 button.interactable = false;
-                --CardHandler.playerFlipped;
-                if(CardHandler.playerFlipped == 0)
+                --CardHandler.Instance.playerFlipped;
+                if(CardHandler.Instance.playerFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.PLAYER_TURN);
                 }
+                break;
+            }
+            case GameState.SWAP1:
+            {
+                if(prevState == GameState.PLAYER_TURN)
+                {
+                    CardHandler.Instance.playerSelectedCard = this;
+                }
+                GameManager.Instance.setGameState(GameState.SWAP2, prevState);
                 break;
             }
         }
@@ -131,8 +142,8 @@ public class Card : MonoBehaviour
             {
                 flipCard();
                 button.interactable = false;
-                --CardHandler.enemyFlipped;
-                if(CardHandler.enemyFlipped == 0)
+                --CardHandler.Instance.enemyFlipped;
+                if(CardHandler.Instance.enemyFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.ENEMY_READY);
                 }   
@@ -142,8 +153,8 @@ public class Card : MonoBehaviour
             {
                 flipCard();
                 button.interactable = false;
-                --CardHandler.enemyFlipped;
-                if(CardHandler.enemyFlipped == 0)
+                --CardHandler.Instance.enemyFlipped;
+                if(CardHandler.Instance.enemyFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.ENEMY_READY);
                 }
@@ -153,8 +164,8 @@ public class Card : MonoBehaviour
             {
                 flipCard();
                 button.interactable = false;
-                --CardHandler.enemyFlipped;
-                if(CardHandler.enemyFlipped == 0)
+                --CardHandler.Instance.enemyFlipped;
+                if(CardHandler.Instance.enemyFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.ENEMY_TURN);
                 }

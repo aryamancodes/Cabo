@@ -16,12 +16,16 @@ public class CardHandler : MonoBehaviour
     public GameObject placeArea;
 
     public Button deck; 
-    public static int playerFlipped = 0;
-    public static int enemyFlipped = 0;
+    public int playerFlipped = 0;
+    public int enemyFlipped = 0;
+
+    public Card playerSelectedCard = null;
+    public Card enemySelectedCard = null;
+
+    public Card played;
 
     void Awake()
     {
-        Debug.Log("Enabled");
         GameManager.gameStateChanged += OnGameStateChanged;
         Instance = this;
         DontDestroyOnLoad(gameObject);
@@ -52,20 +56,57 @@ public class CardHandler : MonoBehaviour
 
         if(currState == GameState.PLAYER_TURN)
         {
-            setPlayerDrag(true);
+            setPlayerClickAndDrag(true, true);
         }
         if(currState == GameState.PLAYER_DRAW)
         {
-           setEnemyDrag(false); 
+           setEnemyClickAndDrag(false, false); 
         }
         if(currState == GameState.ENEMY_DRAW)
         {
-           setPlayerDrag(false); 
+           setPlayerClickAndDrag(false, false); 
         }
 
         if(currState == GameState.ENEMY_TURN)
         {
-            setEnemyDrag(true);
+            setEnemyClickAndDrag(true, true);
+        }
+
+        if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1)
+        {
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setPlayerClickAndDrag(true, false);
+                setEnemyClickAndDrag(false, false);
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                setPlayerClickAndDrag(false, false);
+                setEnemyClickAndDrag(true, false);
+            }
+        }
+
+         if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1)
+        {
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setPlayerClickAndDrag(false, false);
+                setEnemyClickAndDrag(true, false);
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                setPlayerClickAndDrag(true, false);
+                setEnemyClickAndDrag(false, false);
+            }
+        }
+        
+        if(currState == GameState.PEAK_PLAYER)
+        {
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setPlayerClickAndDrag(true, false);
+                setEnemyClickAndDrag(false, false);
+            }
         }
 
     }
@@ -83,7 +124,7 @@ public class CardHandler : MonoBehaviour
             playerCard.gameObject.layer = playerArea.layer;
             if(i%2 == 1)
             {
-                playerCard.card.isSpecialCard  = false; //first peaked cards are not special
+                //playerCard.card.isSpecialCard  = false; //first peaked cards are not special
                 playerCard.flipCard();
             }
             else
@@ -102,7 +143,7 @@ public class CardHandler : MonoBehaviour
             enemyCard.gameObject.layer = enemyArea.layer;
             if(i%2 == 0)
             {
-               enemyCard.card.isSpecialCard  = false; //first peaked cards are not special
+              // enemyCard.card.isSpecialCard  = false; //first peaked cards are not special
                 enemyCard.flipCard();
             }
             else
@@ -167,7 +208,7 @@ public class CardHandler : MonoBehaviour
         card.gameObject.layer = area.layer;
     }
 
-     void setDrawCards(bool val)
+    public void setDrawCards(bool val)
     {
         deck.interactable = val;
         foreach(Transform child in placeArea.transform)
@@ -176,7 +217,7 @@ public class CardHandler : MonoBehaviour
         }
     }
 
-    public void setPlayerDrag(bool val)
+    public void setPlayerClickAndDrag(bool clickVal, bool dragVal)
     {
         foreach(Transform child in playerArea.transform)
         {
@@ -186,12 +227,14 @@ public class CardHandler : MonoBehaviour
             }
             else
             {
-                child.GetChild(0).GetComponent<Card>().button.interactable = val;
+                Card card = child.GetChild(0).GetComponent<Card>();
+                card.canDrag = dragVal;
+                card.button.interactable = clickVal;
             }
         }
     }
 
-    public void setEnemyDrag(bool val)
+    public void setEnemyClickAndDrag(bool clickVal, bool dragVal)
     {
         foreach(Transform child in enemyArea.transform)
         {
@@ -201,13 +244,16 @@ public class CardHandler : MonoBehaviour
             }
             else
             {
-                child.GetChild(0).GetComponent<Card>().button.interactable = val;
+                Card card = child.GetChild(0).GetComponent<Card>();
+                card.canDrag = dragVal;
+                card.button.interactable = clickVal;
             }
         }
     }
 
     public void cardPlayed(Card card)
     {
+        played = card;
         if(card.isSpecialCard)
         {
             GameManager.Instance.setGameState(GameState.SPECIAL_PLAY);
