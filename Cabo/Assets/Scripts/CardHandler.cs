@@ -52,6 +52,8 @@ public class CardHandler : MonoBehaviour
         if(currState == GameState.PLAYER_DRAW || currState == GameState.ENEMY_DRAW)
         {
             setDrawCards(true);
+            FlipDownAllCards();
+
         }
 
         if(currState == GameState.PLAYER_TURN)
@@ -60,19 +62,23 @@ public class CardHandler : MonoBehaviour
         }
         if(currState == GameState.PLAYER_DRAW)
         {
-           setEnemyClickAndDrag(false, false); 
+           setEnemyClickAndDrag(false, false);
+           overrideSpecialCard(currState); 
         }
         if(currState == GameState.ENEMY_DRAW)
         {
            setPlayerClickAndDrag(false, false); 
+           overrideSpecialCard(currState);
         }
 
         if(currState == GameState.ENEMY_TURN)
         {
             setEnemyClickAndDrag(true, true);
+            FlipDownAllCards();
+
         }
 
-        if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1)
+        if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1 || currState == GameState.PEAK_PLAYER)
         {
             if(prevState == GameState.PLAYER_TURN)
             {
@@ -86,7 +92,7 @@ public class CardHandler : MonoBehaviour
             }
         }
 
-         if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1)
+         if(currState == GameState.SWAP2 || currState == GameState.BLIND_SWAP2 || currState == GameState.PEAK_ENEMY)
         {
             if(prevState == GameState.PLAYER_TURN)
             {
@@ -94,15 +100,6 @@ public class CardHandler : MonoBehaviour
                 setEnemyClickAndDrag(true, false);
             }
             else if(prevState == GameState.ENEMY_TURN)
-            {
-                setPlayerClickAndDrag(true, false);
-                setEnemyClickAndDrag(false, false);
-            }
-        }
-        
-        if(currState == GameState.PEAK_PLAYER)
-        {
-            if(prevState == GameState.PLAYER_TURN)
             {
                 setPlayerClickAndDrag(true, false);
                 setEnemyClickAndDrag(false, false);
@@ -118,13 +115,15 @@ public class CardHandler : MonoBehaviour
             Card playerCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject playerSlot = Instantiate(playerCard.slot, new Vector2(0,0), Quaternion.identity);
             playerCard.card = DeckGenerator.getCard();
+            playerCard.card.value = 13;
+            playerCard.card.isSpecialCard = true;
             playerCard.back = playerBack;
+            //playerCard.card.isSpecialCard = false;
             playerSlot.transform.SetParent(playerArea.transform, false);
             playerCard.transform.SetParent(playerSlot.transform, false);
             playerCard.gameObject.layer = playerArea.layer;
             if(i%2 == 1)
             {
-                //playerCard.card.isSpecialCard  = false; //first peaked cards are not special
                 playerCard.flipCard();
             }
             else
@@ -138,12 +137,12 @@ public class CardHandler : MonoBehaviour
             GameObject enemySlot = Instantiate(enemyCard.slot, new Vector2(0,0), Quaternion.identity);
             enemyCard.card = DeckGenerator.getCard();
             enemyCard.back = enemyBack;
+            //enemyCard.card.isSpecialCard = false;
             enemySlot.transform.SetParent(enemyArea.transform, false);
             enemyCard.transform.SetParent(enemySlot.transform, false);
             enemyCard.gameObject.layer = enemyArea.layer;
             if(i%2 == 0)
             {
-              // enemyCard.card.isSpecialCard  = false; //first peaked cards are not special
                 enemyCard.flipCard();
             }
             else
@@ -208,12 +207,60 @@ public class CardHandler : MonoBehaviour
         card.gameObject.layer = area.layer;
     }
 
+    //if a card is drawn and not played immediately, it is no longer special
+    public void overrideSpecialCard(GameState curr)
+    {
+        // if(curr == GameState.PLAYER_DRAW)
+        // {
+        //     foreach(Transform child in enemyArea.transform)
+        //     {
+        //         if(child.childCount != 0)
+        //         {
+        //             child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
+        //         }
+        //     }
+
+        // }
+        // if(curr == GameState.ENEMY_DRAW)
+        // {
+        //     foreach(Transform child in playerArea.transform)
+        //     {
+        //         if(child.childCount != 0)
+        //         {
+        //             child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
+        //         }
+        //     }
+
+        // foreach(Transform child in placeArea.transform)
+        // {
+        //     child.GetComponent<Card>().card.isSpecialCard = false;
+        // }
+    }
+
+    public void FlipDownAllCards()
+    {
+        if(playerSelectedCard != null)
+        {
+            playerSelectedCard.flipCard("down");
+            playerSelectedCard = null;
+        }
+
+        if(enemySelectedCard != null)
+        {
+            enemySelectedCard.flipCard("down");
+            enemySelectedCard = null;
+        }
+
+    }
+
     public void setDrawCards(bool val)
     {
         deck.interactable = val;
         foreach(Transform child in placeArea.transform)
         {
-            child.GetComponent<Card>().button.interactable = val;
+            var card = child.GetComponent<Card>();
+            card.button.interactable = val;
+            card.canDrag = val;
         }
     }
 
@@ -221,11 +268,7 @@ public class CardHandler : MonoBehaviour
     {
         foreach(Transform child in playerArea.transform)
         {
-            if(child.childCount == 0)
-            {
-                continue;
-            }
-            else
+            if(child.childCount != 0)
             {
                 Card card = child.GetChild(0).GetComponent<Card>();
                 card.canDrag = dragVal;
@@ -254,14 +297,22 @@ public class CardHandler : MonoBehaviour
     public void cardPlayed(Card card)
     {
         played = card;
-        if(card.isSpecialCard)
+        if(played != null)
         {
-            GameManager.Instance.setGameState(GameState.SPECIAL_PLAY);
+            if(card.isSpecialCard)
+            {
+                GameManager.Instance.setGameState(GameState.SPECIAL_PLAY);
+            }
+            else
+            {
+                GameManager.Instance.setGameState(GameState.PLAY);
+            }   
         }
-        else
-        {
-            GameManager.Instance.setGameState(GameState.PLAY);
-        }   
+    }
+
+    public void swapCards()
+    {
+        
     }
 
 }

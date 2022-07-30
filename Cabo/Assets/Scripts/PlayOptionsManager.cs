@@ -100,7 +100,6 @@ public class PlayOptionsManager : MonoBehaviour
             enemy_hint.Text.text = dict[GameState.PLAYER_DRAW][0];
         }
 
-
         if(currState == GameState.PLAYER_TURN)
         {
             player_hint.Text.text = dict[currState][0];
@@ -111,6 +110,7 @@ public class PlayOptionsManager : MonoBehaviour
         {
             player_hint.Text.text = dict[GameState.PLAYER_TURN][1];
             enemy_hint.Text.text = dict[GameState.PLAYER_TURN][0];
+
         }
 
 
@@ -131,7 +131,15 @@ public class PlayOptionsManager : MonoBehaviour
 
         if(currState == GameState.SPECIAL_PLAY)
         {
-            int value = CardHandler.Instance.played.card.value;
+            var lastPlayed = CardHandler.Instance.played;
+
+            if(lastPlayed == null)
+            {
+                showOption("swap");
+                return;
+            }
+
+            int value = lastPlayed.card.value;
 
             if(value == 7 || value == 8)
             {
@@ -147,7 +155,7 @@ public class PlayOptionsManager : MonoBehaviour
             }
             if(value == 13)
             {
-                showOption("swap");
+                showOption("peak_and_swap");
             }
         }
 

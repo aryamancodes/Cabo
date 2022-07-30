@@ -121,21 +121,56 @@ public class Card : MonoBehaviour
                 }
                 break;
             }
+            case GameState.PEAK_PLAYER:
+            {
+                flipCard();
+                CardHandler.Instance.playerSelectedCard = this;
+                GameManager.Instance.setGameState(GameState.PLAY, GameState.PLAYER_TURN);
+                break;
+            }
+            case GameState.PEAK_ENEMY:
+            {
+                flipCard();
+                CardHandler.Instance.enemySelectedCard = this;
+                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                break;
+            }
+            case GameState.BLIND_SWAP1:
+            {
+                CardHandler.Instance.enemySelectedCard = this;
+                GameManager.Instance.setGameState(GameState.BLIND_SWAP2, prevState);
+                break; 
+            }
+            case GameState.BLIND_SWAP2:
+            {
+                CardHandler.Instance.enemySelectedCard = this;
+                CardHandler.Instance.swapCards();
+                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                break; 
+            }
             case GameState.SWAP1:
             {
-                if(prevState == GameState.PLAYER_TURN)
-                {
-                    CardHandler.Instance.playerSelectedCard = this;
-                }
+                flipCard();
+                CardHandler.Instance.playerSelectedCard = this;
                 GameManager.Instance.setGameState(GameState.SWAP2, prevState);
                 break;
             }
+            case GameState.SWAP2:
+            {
+                flipCard();
+                CardHandler.Instance.playerSelectedCard = this;
+                CardHandler.Instance.cardPlayed(null);                
+                GameManager.Instance.setGameState(GameState.SPECIAL_PLAY, prevState);
+                break;
+            }
+
         }
     }
 
     public void enemyCardClicked()
     {
         var currState = GameManager.Instance.currState;
+        var prevState = GameManager.Instance.prevState;
         switch(currState)
         {
             case GameState.START:
@@ -169,6 +204,50 @@ public class Card : MonoBehaviour
                 {
                     GameManager.Instance.setGameState(GameState.ENEMY_TURN);
                 }
+                break;
+            }
+            case GameState.PEAK_PLAYER:
+            {
+                flipCard();                
+                CardHandler.Instance.playerSelectedCard = this;
+                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                break;
+
+            }
+            case GameState.PEAK_ENEMY:
+            {
+                flipCard();
+                CardHandler.Instance.enemySelectedCard = this;
+                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                break;
+
+            }
+            case GameState.BLIND_SWAP1:
+            {
+                CardHandler.Instance.enemySelectedCard = this;
+                GameManager.Instance.setGameState(GameState.BLIND_SWAP2, prevState);
+                break; 
+            }
+            case GameState.BLIND_SWAP2:
+            {
+                CardHandler.Instance.enemySelectedCard = this;
+                CardHandler.Instance.swapCards();
+                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                break; 
+            }
+            case GameState.SWAP1:
+            {
+                flipCard();
+                CardHandler.Instance.enemySelectedCard = this;
+                GameManager.Instance.setGameState(GameState.SWAP2, prevState);
+                break;
+            }
+            case GameState.SWAP2:
+            {
+                flipCard();
+                CardHandler.Instance.enemySelectedCard = this;
+                CardHandler.Instance.cardPlayed(null);                
+                GameManager.Instance.setGameState(GameState.SPECIAL_PLAY, prevState);
                 break;
             }
         }

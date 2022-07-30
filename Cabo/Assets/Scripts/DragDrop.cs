@@ -111,6 +111,7 @@ public class DragDrop : MonoBehaviour
         if(startParent.layer == GameManager.Instance.UILayer)
         {
             CardHandler.Instance.setPlayerClickAndDrag(false, false);
+            
         }
         //replace a previously moved card
         foreach(Transform child in dropZone.transform)

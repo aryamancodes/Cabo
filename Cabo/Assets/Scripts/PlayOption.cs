@@ -51,9 +51,14 @@ public class PlayOption : MonoBehaviour
             GameManager.Instance.setGameState(GameState.BLIND_SWAP1, prev);
         }
 
-        if(optionName == "swap")
+        if(optionName == "peak_and_swap")
         {
             GameManager.Instance.setGameState(GameState.SWAP1, prev);
+        }
+        if(optionName == "swap")
+        {
+            CardHandler.Instance.swapCards();
+            GameManager.Instance.setGameState(GameState.PLAY, prev);
         }
         if(optionName == "peak_player")
         {

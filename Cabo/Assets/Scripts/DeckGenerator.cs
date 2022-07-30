@@ -29,8 +29,8 @@ public class DeckGenerator: MonoBehaviour
             
             if(suit == CardBase.Suit.Joker)
             {
-                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][0], -1, CardBase.Suit.Joker, false));
-                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][1], -1, CardBase.Suit.Joker, false));
+                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][0], -2, CardBase.Suit.Joker, false));
+                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][1], -2, CardBase.Suit.Joker, false));
                 continue;
             }
 
@@ -41,7 +41,7 @@ public class DeckGenerator: MonoBehaviour
                 //red kings have a special value but aren't special card when played
                 if(i == 12 && (suit == CardBase.Suit.Heart || suit == CardBase.Suit.Diamond))
                 {
-                    deck.Add(CardBase.CreateInstance(dict[suit][i], 0, suit, false));
+                    deck.Add(CardBase.CreateInstance(dict[suit][i], -1, suit, false));
                     continue;
                 }
 
