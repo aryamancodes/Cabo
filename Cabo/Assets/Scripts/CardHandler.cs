@@ -52,8 +52,15 @@ public class CardHandler : MonoBehaviour
         if(currState == GameState.PLAYER_DRAW || currState == GameState.ENEMY_DRAW)
         {
             setDrawCards(true);
+            setPlayerClickAndDrag(false, false);
+            setEnemyClickAndDrag(false, false);
             FlipDownAllCards();
+        }
 
+        if(currState == GameState.PLAY)
+        {
+            setPlayerClickAndDrag(false, false);
+            setEnemyClickAndDrag(false, false);
         }
 
         if(currState == GameState.PLAYER_TURN)
@@ -67,15 +74,15 @@ public class CardHandler : MonoBehaviour
         }
         if(currState == GameState.ENEMY_DRAW)
         {
-           setPlayerClickAndDrag(false, false); 
-           overrideSpecialCard(currState);
+            setPlayerClickAndDrag(false, false);
+            setPlayerClickAndDrag(false, false);
+            setEnemyClickAndDrag(false, false); 
+            overrideSpecialCard(currState);
         }
 
         if(currState == GameState.ENEMY_TURN)
         {
             setEnemyClickAndDrag(true, true);
-            FlipDownAllCards();
-
         }
 
         if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1 || currState == GameState.PEAK_PLAYER)
@@ -115,10 +122,9 @@ public class CardHandler : MonoBehaviour
             Card playerCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject playerSlot = Instantiate(playerCard.slot, new Vector2(0,0), Quaternion.identity);
             playerCard.card = DeckGenerator.getCard();
-            playerCard.card.value = 13;
-            playerCard.card.isSpecialCard = true;
+            playerCard.value = 13;
+            playerCard.isSpecialCard = true;
             playerCard.back = playerBack;
-            //playerCard.card.isSpecialCard = false;
             playerSlot.transform.SetParent(playerArea.transform, false);
             playerCard.transform.SetParent(playerSlot.transform, false);
             playerCard.gameObject.layer = playerArea.layer;
@@ -137,7 +143,6 @@ public class CardHandler : MonoBehaviour
             GameObject enemySlot = Instantiate(enemyCard.slot, new Vector2(0,0), Quaternion.identity);
             enemyCard.card = DeckGenerator.getCard();
             enemyCard.back = enemyBack;
-            //enemyCard.card.isSpecialCard = false;
             enemySlot.transform.SetParent(enemyArea.transform, false);
             enemyCard.transform.SetParent(enemySlot.transform, false);
             enemyCard.gameObject.layer = enemyArea.layer;
@@ -242,12 +247,16 @@ public class CardHandler : MonoBehaviour
         if(playerSelectedCard != null)
         {
             playerSelectedCard.flipCard("down");
+            playerSelectedCard.button.interactable = false;
+            playerSelectedCard.canDrag = false;
             playerSelectedCard = null;
         }
 
         if(enemySelectedCard != null)
         {
             enemySelectedCard.flipCard("down");
+            enemySelectedCard.button.interactable = false;
+            enemySelectedCard.canDrag = false;
             enemySelectedCard = null;
         }
 
@@ -271,6 +280,7 @@ public class CardHandler : MonoBehaviour
             if(child.childCount != 0)
             {
                 Card card = child.GetChild(0).GetComponent<Card>();
+                if(card == playerSelectedCard || card == enemySelectedCard){ continue; }
                 card.canDrag = dragVal;
                 card.button.interactable = clickVal;
             }
@@ -281,13 +291,10 @@ public class CardHandler : MonoBehaviour
     {
         foreach(Transform child in enemyArea.transform)
         {
-            if(child.childCount == 0)
-            {
-                continue;
-            }
-            else
+            if(child.childCount != 0)
             {
                 Card card = child.GetChild(0).GetComponent<Card>();
+                if(card == playerSelectedCard || card == enemySelectedCard){ continue; }
                 card.canDrag = dragVal;
                 card.button.interactable = clickVal;
             }
@@ -312,7 +319,12 @@ public class CardHandler : MonoBehaviour
 
     public void swapCards()
     {
-        
+        var playerParent = playerSelectedCard.transform.parent;
+        var enemyparent = enemySelectedCard.transform.parent;
+        playerSelectedCard.transform.SetParent(enemyparent);
+        enemySelectedCard.transform.SetParent(playerParent);
+        playerSelectedCard.gameObject.layer = GameManager.Instance.enemyLayer;
+        enemySelectedCard.gameObject.layer = GameManager.Instance.playerLayer;
     }
 
 }

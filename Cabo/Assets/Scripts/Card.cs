@@ -37,7 +37,7 @@ public class Card : MonoBehaviour
             image.sprite = back;
         }
 
-    }
+    } 
 
     public void flipCard()
     {
@@ -69,6 +69,10 @@ public class Card : MonoBehaviour
 
     public void cardClicked()
     {
+        if(this == CardHandler.Instance.playerSelectedCard || this == CardHandler.Instance.enemySelectedCard)
+        {
+            return;
+        }
         if(gameObject.layer == GameManager.Instance.playerLayer)
         {
             playerCardClicked();
@@ -137,13 +141,13 @@ public class Card : MonoBehaviour
             }
             case GameState.BLIND_SWAP1:
             {
-                CardHandler.Instance.enemySelectedCard = this;
+                CardHandler.Instance.playerSelectedCard = this;
                 GameManager.Instance.setGameState(GameState.BLIND_SWAP2, prevState);
                 break; 
             }
             case GameState.BLIND_SWAP2:
             {
-                CardHandler.Instance.enemySelectedCard = this;
+                CardHandler.Instance.playerSelectedCard = this;
                 CardHandler.Instance.swapCards();
                 GameManager.Instance.setGameState(GameState.PLAY, prevState);
                 break; 
