@@ -49,12 +49,20 @@ public class CardHandler : MonoBehaviour
             setDrawCards(false);
         }
  
-        if(currState == GameState.PLAYER_DRAW || currState == GameState.ENEMY_DRAW)
+        if(currState == GameState.PLAYER_DRAW)
+        {
+            setDrawCards(true);
+            setPlayerClickAndDrag(true, false);
+            setEnemyClickAndDrag(false, false);
+            FlipDownAllCards();
+        }
+
+        if(currState == GameState.ENEMY_DRAW)
         {
             setDrawCards(true);
             setPlayerClickAndDrag(false, false);
-            setEnemyClickAndDrag(false, false);
-            FlipDownAllCards();
+            setEnemyClickAndDrag(true, false);
+            FlipDownAllCards(); 
         }
 
         if(currState == GameState.PLAY)
@@ -69,14 +77,14 @@ public class CardHandler : MonoBehaviour
         }
         if(currState == GameState.PLAYER_DRAW)
         {
-           setEnemyClickAndDrag(false, false);
-           overrideSpecialCard(currState); 
+            setPlayerClickAndDrag(true, false);
+            setEnemyClickAndDrag(false, false);
+            overrideSpecialCard(currState); 
         }
         if(currState == GameState.ENEMY_DRAW)
         {
             setPlayerClickAndDrag(false, false);
-            setPlayerClickAndDrag(false, false);
-            setEnemyClickAndDrag(false, false); 
+            setEnemyClickAndDrag(true, false); 
             overrideSpecialCard(currState);
         }
 
@@ -122,12 +130,11 @@ public class CardHandler : MonoBehaviour
             Card playerCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject playerSlot = Instantiate(playerCard.slot, new Vector2(0,0), Quaternion.identity);
             playerCard.card = DeckGenerator.getCard();
-            playerCard.value = 13;
-            playerCard.isSpecialCard = true;
             playerCard.back = playerBack;
             playerSlot.transform.SetParent(playerArea.transform, false);
             playerCard.transform.SetParent(playerSlot.transform, false);
             playerCard.gameObject.layer = playerArea.layer;
+            playerSlot.gameObject.layer = playerArea.layer;
             if(i%2 == 1)
             {
                 playerCard.flipCard();
@@ -146,6 +153,7 @@ public class CardHandler : MonoBehaviour
             enemySlot.transform.SetParent(enemyArea.transform, false);
             enemyCard.transform.SetParent(enemySlot.transform, false);
             enemyCard.gameObject.layer = enemyArea.layer;
+            enemySlot.gameObject.layer = enemyArea.layer;
             if(i%2 == 0)
             {
                 enemyCard.flipCard();
@@ -165,14 +173,14 @@ public class CardHandler : MonoBehaviour
         drawnCard.card = DeckGenerator.getCard();
         if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
         {
+            slot.layer = GameManager.Instance.playerLayer;
             drawnCard.back = playerBack;
             insertDrawnCard(playerArea, slot, drawnCard);
-            playerFlipped++;
         }
         else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
         {
+            slot.layer = GameManager.Instance.enemyLayer;
             drawnCard.back = enemyBack;
-            enemyFlipped++;
             insertDrawnCard(enemyArea, slot, null,drawnCard);
         }
         setDrawCards(false);
@@ -285,6 +293,7 @@ public class CardHandler : MonoBehaviour
                 card.button.interactable = clickVal;
             }
         }
+       playerArea.GetComponent<Rigidbody2D>().simulated = clickVal;
     }
 
     public void setEnemyClickAndDrag(bool clickVal, bool dragVal)
@@ -299,6 +308,7 @@ public class CardHandler : MonoBehaviour
                 card.button.interactable = clickVal;
             }
         }
+        enemyArea.GetComponent<Rigidbody2D>().simulated = clickVal;
     }
 
     public void cardPlayed(Card card)

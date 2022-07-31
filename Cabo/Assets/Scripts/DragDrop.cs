@@ -9,7 +9,7 @@ public class DragDrop : MonoBehaviour
     private GameObject canvas;
     private GameObject placeCard;
     private GameObject slot;
-    private GameObject startParent = null;
+    public GameObject startParent = null;
     private bool isDragging = false; 
     private GameObject dropZone = null;
     private int UILayer;
@@ -45,15 +45,14 @@ public class DragDrop : MonoBehaviour
         dropZone = null;
     }
 
+    public void setStartParent()
+    {
+        startParent = this.transform.parent.gameObject;
+    }
     public void startDrag()
     {
-        var currState = GameManager.Instance.currState;
         if(card.canDrag)
         {
-            if(startParent == null)
-            {
-                startParent = transform.parent.gameObject;
-            }
             isDragging = true;
         }
     }
@@ -66,7 +65,7 @@ public class DragDrop : MonoBehaviour
 
             if(dropZone != null)
             {
-                if(dropZone.layer == GameManager.Instance.UILayer) //drop card into center
+                if(dropZone.layer == GameManager.Instance.UILayer && startParent.layer != GameManager.Instance.UILayer) //drop card into center
                 {
                     transform.position = placeCard.transform.position;
                     transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
@@ -75,16 +74,12 @@ public class DragDrop : MonoBehaviour
                     Card played = transform.gameObject.GetComponent<Card>();
                     played.flipCard("up");
                     CardHandler.Instance.cardPlayed(played);
-                    CardHandler.Instance.setDrawCards(false);
-                    if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
-                    {
-                        CardHandler.Instance.setPlayerClickAndDrag(false, false);
-                    }
-                    else if(GameManager.Instance.prevState == GameState.ENEMY_TURN)
-                    {
-                        CardHandler.Instance.setEnemyClickAndDrag(false, false);
+                    CardHandler.Instance.setDrawCards(false); 
+                }
 
-                    }
+                else if(startParent.layer == GameManager.Instance.UILayer)
+                {
+                    drawFromPlaceCard();
                 }
 
                 else
@@ -96,6 +91,7 @@ public class DragDrop : MonoBehaviour
             //return back to starting position
             else
             {
+                transform.position = startParent.transform.position;
                 transform.SetParent(startParent.transform, true);
                 transform.rotation = Quaternion.identity;
 
@@ -104,29 +100,31 @@ public class DragDrop : MonoBehaviour
         }
     }
 
+    void drawFromPlaceCard()
+    {
+        insertIntoArea();
+        CardHandler.Instance.setDrawCards(false);
+    }
 
-    //dropping in enemy's grid layout group
+
+    //dropping in the player or enemy grid layout group
     void insertIntoArea()
     {
-        if(startParent.layer == GameManager.Instance.UILayer)
-        {
-            CardHandler.Instance.setPlayerClickAndDrag(false, false);
-            
-        }
         //replace a previously moved card
         foreach(Transform child in dropZone.transform)
+        {
+            if(child.childCount == 0)
             {
-                if(child.childCount == 0)
-                {
-                    transform.SetParent(child, true);
-                    transform.gameObject.layer = dropZone.layer;
-                    transform.rotation = Quaternion.identity;
-                    return;
-                }
+                transform.SetParent(child, true);
+                transform.gameObject.layer = dropZone.layer;
+                transform.rotation = Quaternion.identity;
+                return;
             }
+        }
         //insert as a new card 
         GameObject newSlot = Instantiate(slot, new Vector2(0,0), Quaternion.identity);
         newSlot.transform.SetParent(dropZone.transform, false);
+        newSlot.gameObject.layer = dropZone.layer;
         transform.SetParent(newSlot.transform, false);
         transform.gameObject.layer = dropZone.layer;
         transform.rotation = Quaternion.identity;

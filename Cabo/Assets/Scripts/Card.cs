@@ -116,11 +116,10 @@ public class Card : MonoBehaviour
             }
             case GameState.PLAYER_DRAW:
             {
-                flipCard();
-                button.interactable = false;
-                --CardHandler.Instance.playerFlipped;
-                if(CardHandler.Instance.playerFlipped == 0)
+                if(this.faceUp == true)
                 {
+                    flipCard();
+                    button.interactable = false;
                     GameManager.Instance.setGameState(GameState.PLAYER_TURN);
                 }
                 break;
@@ -201,11 +200,10 @@ public class Card : MonoBehaviour
             }
             case GameState.ENEMY_DRAW:
             {
-                flipCard();
-                button.interactable = false;
-                --CardHandler.Instance.enemyFlipped;
-                if(CardHandler.Instance.enemyFlipped == 0)
+                if(this.faceUp == true)
                 {
+                    flipCard();
+                    button.interactable = false;
                     GameManager.Instance.setGameState(GameState.ENEMY_TURN);
                 }
                 break;
