@@ -13,9 +13,8 @@ public class PlayOptionsManager : MonoBehaviour
     {
         { GameState.START, new List<string>{"Click on the flipped cards when you're ready!", "Click on the flipped cards when you're ready!"} },
         { GameState.PLAYER_READY, new List<string>{"Waiting for opponent!", "Click on the flipped cards when you're ready!"} },
-        { GameState.PLAYER_DRAW, new List<string>{"Draw a card or drag a previously played card in your area. Click the flipped card when you're ready!"
+        { GameState.PLAYER_DRAW, new List<string>{"It's your turn! You can wraw a card or drag a a card from the discard pile in your area. Click the flipped card when you're ready!"
                                                 , "Waiting for opponent to draw card!"} },
-
         { GameState.PLAYER_TURN, new List<string>{"Place a card in the middle to play!", "Waiting for opponent to play a card!"} },
         { GameState.PLAY, new List<string>{"Don't forget to end turn!", "Waiting for opponent to end turn!"} },
         { GameState.SPECIAL_PLAY, new List<string>{"Select a special option or end turn!", "Waiting for opponent to end turn!"} },
@@ -25,6 +24,8 @@ public class PlayOptionsManager : MonoBehaviour
         { GameState.BLIND_SWAP2, new List<string>{"Select one of the opponent's cards to swap!", "Waiting for opponent to swap cards!"} },
         { GameState.SWAP1, new List<string>{"Select one of your cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
         { GameState.SWAP2, new List<string>{"Select one of the opponent's cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
+        { GameState.SNAP_PASS, new List<string>{"You've succesfully snapped a card !", "Click on the flipped cards when you're ready!"} },
+
 
     };
 

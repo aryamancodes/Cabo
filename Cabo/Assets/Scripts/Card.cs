@@ -69,10 +69,10 @@ public class Card : MonoBehaviour
 
     public void cardClicked()
     {
-        if(this == CardHandler.Instance.playerSelectedCard || this == CardHandler.Instance.enemySelectedCard)
-        {
-            return;
-        }
+        // if(this == CardHandler.Instance.playerSelectedCard || this == CardHandler.Instance.enemySelectedCard)
+        // {
+        //     return;
+        // }
         if(gameObject.layer == GameManager.Instance.playerLayer)
         {
             playerCardClicked();
@@ -116,6 +116,7 @@ public class Card : MonoBehaviour
             }
             case GameState.PLAYER_DRAW:
             {
+                Debug.Log("reaching hrere");
                 if(this.faceUp == true)
                 {
                     flipCard();

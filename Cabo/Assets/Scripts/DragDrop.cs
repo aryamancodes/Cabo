@@ -65,6 +65,10 @@ public class DragDrop : MonoBehaviour
 
             if(dropZone != null)
             {
+                if(dropZone.layer == GameManager.Instance.IgnoreLayer)
+                {
+                    returnToStart();
+                }
                 if(dropZone.layer == GameManager.Instance.UILayer && startParent.layer != GameManager.Instance.UILayer) //drop card into center
                 {
                     transform.position = placeCard.transform.position;
@@ -73,8 +77,15 @@ public class DragDrop : MonoBehaviour
                     transform.SetParent(placeCard.transform);
                     Card played = transform.gameObject.GetComponent<Card>();
                     played.flipCard("up");
-                    CardHandler.Instance.cardPlayed(played);
-                    CardHandler.Instance.setDrawCards(false); 
+                    //FIXME: Correctly detect who snaps the card
+                    if(GameManager.Instance.currState == GameState.PLAYER_DRAW || GameManager.Instance.currState == GameState.ENEMY_DRAW)
+                    {
+                        GameState whoSnapped = GameState.NONE; 
+                        if(startParent.layer == GameManager.Instance.playerLayer){ whoSnapped = GameState.PLAYER_TURN; }
+                        else if(startParent.layer == GameManager.Instance.enemyLayer) { whoSnapped = GameState.ENEMY_TURN; }
+                        CardHandler.Instance.checkSnapped(whoSnapped); 
+                    }
+                    else { CardHandler.Instance.cardPlayed(played); }
                 }
 
                 else if(startParent.layer == GameManager.Instance.UILayer)
@@ -91,21 +102,38 @@ public class DragDrop : MonoBehaviour
             //return back to starting position
             else
             {
-                transform.position = startParent.transform.position;
-                transform.SetParent(startParent.transform, true);
-                transform.rotation = Quaternion.identity;
+                returnToStart();
 
             }
             dropZone = null;
         }
     }
 
+    void returnToStart()
+    {
+        transform.position = startParent.transform.position;
+        transform.SetParent(startParent.transform, true);
+        transform.rotation = Quaternion.identity;
+    }
+
     void drawFromPlaceCard()
     {
         insertIntoArea();
-        CardHandler.Instance.setDrawCards(false);
+        CardHandler.Instance.setDrawCardsAndArea(false, false);
+        if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
+        { 
+            CardHandler.Instance.playerSelectedCard = this.gameObject.GetComponent<Card>();
+            CardHandler.Instance.setPlayerClickDragAndArea(false, false, false); 
+            CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
+        }
+        else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
+        {
+            CardHandler.Instance.enemySelectedCard = this.gameObject.GetComponent<Card>();
+            CardHandler.Instance.setEnemyClickDragAndArea(false, false, false); 
+            CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
+        }
+        
     }
-
 
     //dropping in the player or enemy grid layout group
     void insertIntoArea()

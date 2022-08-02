@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public enum GameState{ START, PLAYER_READY, PLAYER_DRAW, PLAYER_TURN,
-                        ENEMY_READY, ENEMY_DRAW, ENEMY_TURN, ALL_TURN, 
+                        ENEMY_READY, ENEMY_DRAW, ENEMY_TURN, SNAP_PASS, SNAP_FAIL, 
                         BLIND_SWAP1, BLIND_SWAP2, SWAP1, SWAP2, PEAK_PLAYER, PEAK_ENEMY, PLAY, SPECIAL_PLAY, CABO, 
                         GAME_OVER, REPLAY_NORMAL, REPLAY_FALSE_CABO, PAUSE, QUIT, NONE }
 
@@ -19,12 +19,14 @@ public class GameManager : MonoBehaviour
     public int playerLayer;
     public int enemyLayer;
     public int UILayer;
+    public int IgnoreLayer;
 
     void Awake()
     {
         playerLayer = LayerMask.NameToLayer("Player");
         enemyLayer = LayerMask.NameToLayer("Enemy");
         UILayer = LayerMask.NameToLayer("UI");
+        IgnoreLayer = LayerMask.NameToLayer("Default");
         Instance = this;
         DontDestroyOnLoad(gameObject);
     }

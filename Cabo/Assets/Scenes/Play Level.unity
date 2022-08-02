@@ -1005,6 +1005,7 @@ MonoBehaviour:
   playerLayer: 0
   enemyLayer: 0
   UILayer: 0
+  IgnoreLayer: 0
 --- !u!114 &362921056
 MonoBehaviour:
   m_ObjectHideFlags: 0

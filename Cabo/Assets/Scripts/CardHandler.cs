@@ -23,6 +23,7 @@ public class CardHandler : MonoBehaviour
     public Card enemySelectedCard = null;
 
     public Card played;
+    public bool firstDraw = true;
 
     void Awake()
     {
@@ -46,64 +47,61 @@ public class CardHandler : MonoBehaviour
         if(currState == GameState.START)
         {
             firstDistribute();
-            setDrawCards(false);
+            setDrawCardsAndArea(false, false);
         }
  
         if(currState == GameState.PLAYER_DRAW)
         {
-            setDrawCards(true);
-            setPlayerClickAndDrag(true, false);
-            setEnemyClickAndDrag(false, false);
-            FlipDownAllCards();
+            setDrawCardsAndArea(true, true);
+            flipDownAllCards();
+            setPlayerClickDragAndArea(true, true, true);
+            setEnemyClickDragAndArea(true, true, false);
+            overrideSpecialCard(currState); 
         }
 
         if(currState == GameState.ENEMY_DRAW)
         {
-            setDrawCards(true);
-            setPlayerClickAndDrag(false, false);
-            setEnemyClickAndDrag(true, false);
-            FlipDownAllCards(); 
+            setDrawCardsAndArea(true, true);
+            flipDownAllCards(); 
+            setPlayerClickDragAndArea(true, true, false);
+            setEnemyClickDragAndArea(true, true, true);
+            overrideSpecialCard(currState); 
         }
 
         if(currState == GameState.PLAY)
         {
-            setPlayerClickAndDrag(false, false);
-            setEnemyClickAndDrag(false, false);
+            setDrawCardsAndArea(false, false);
+            setPlayerClickDragAndArea(false, false, false);
+            setEnemyClickDragAndArea(false, false, false);
         }
 
         if(currState == GameState.PLAYER_TURN)
         {
-            setPlayerClickAndDrag(true, true);
-        }
-        if(currState == GameState.PLAYER_DRAW)
-        {
-            setPlayerClickAndDrag(true, false);
-            setEnemyClickAndDrag(false, false);
-            overrideSpecialCard(currState); 
-        }
-        if(currState == GameState.ENEMY_DRAW)
-        {
-            setPlayerClickAndDrag(false, false);
-            setEnemyClickAndDrag(true, false); 
-            overrideSpecialCard(currState);
+            flipDownAllCards();
+            setDrawCardsAndArea(false, true);
+            setPlayerClickDragAndArea(true, true, false);
+            setEnemyClickDragAndArea(false, false, false);
         }
 
         if(currState == GameState.ENEMY_TURN)
         {
-            setEnemyClickAndDrag(true, true);
+            flipDownAllCards();
+            setDrawCardsAndArea(false, true);
+            setPlayerClickDragAndArea(false, true, false);
+            setEnemyClickDragAndArea(true, true, false);
         }
 
         if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1 || currState == GameState.PEAK_PLAYER)
         {
             if(prevState == GameState.PLAYER_TURN)
             {
-                setPlayerClickAndDrag(true, false);
-                setEnemyClickAndDrag(false, false);
+                setPlayerClickDragAndArea(true, false, false);
+                setEnemyClickDragAndArea(false, false, false);
             }
             else if(prevState == GameState.ENEMY_TURN)
             {
-                setPlayerClickAndDrag(false, false);
-                setEnemyClickAndDrag(true, false);
+                setPlayerClickDragAndArea(false, false, false);
+                setEnemyClickDragAndArea(true, false, false);
             }
         }
 
@@ -111,13 +109,28 @@ public class CardHandler : MonoBehaviour
         {
             if(prevState == GameState.PLAYER_TURN)
             {
-                setPlayerClickAndDrag(false, false);
-                setEnemyClickAndDrag(true, false);
+                setPlayerClickDragAndArea(false, false, false);
+                setEnemyClickDragAndArea(true, false, false);
             }
             else if(prevState == GameState.ENEMY_TURN)
             {
-                setPlayerClickAndDrag(true, false);
-                setEnemyClickAndDrag(false, false);
+                setPlayerClickDragAndArea(true, false, false);
+                setEnemyClickDragAndArea(false, false, false);
+            }
+        }
+
+        if(currState == GameState.SNAP_PASS)
+        {
+            setDrawCardsAndArea(false, false);
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setPlayerClickDragAndArea(true, true, false);
+                setEnemyClickDragAndArea(false, false, true);
+            }
+            if(prevState == GameState.ENEMY_TURN)
+            {
+                setPlayerClickDragAndArea(false, true, true);
+                setEnemyClickDragAndArea(true, true, false);
             }
         }
 
@@ -176,14 +189,22 @@ public class CardHandler : MonoBehaviour
             slot.layer = GameManager.Instance.playerLayer;
             drawnCard.back = playerBack;
             insertDrawnCard(playerArea, slot, drawnCard);
+            playerSelectedCard = drawnCard;
+            setPlayerClickDragAndArea(false, false, true);
+            setEnemyClickDragAndArea(false, false, false);
+
         }
         else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
         {
             slot.layer = GameManager.Instance.enemyLayer;
             drawnCard.back = enemyBack;
+            enemySelectedCard = drawnCard;
             insertDrawnCard(enemyArea, slot, null,drawnCard);
+            setPlayerClickDragAndArea(false, false, false);
+            setEnemyClickDragAndArea(false, false, false);
+
         }
-        setDrawCards(false);
+        setDrawCardsAndArea(false, false);
     }
 
     public void insertDrawnCard(GameObject area, GameObject slot, Card playerCard=null, Card enemyCard=null)
@@ -250,7 +271,7 @@ public class CardHandler : MonoBehaviour
         // }
     }
 
-    public void FlipDownAllCards()
+    public void flipDownAllCards()
     {
         if(playerSelectedCard != null)
         {
@@ -270,18 +291,20 @@ public class CardHandler : MonoBehaviour
 
     }
 
-    public void setDrawCards(bool val)
+    public void setDrawCardsAndArea(bool drawVal, bool areaVal)
     {
-        deck.interactable = val;
+        deck.interactable = drawVal;
         foreach(Transform child in placeArea.transform)
         {
             var card = child.GetComponent<Card>();
-            card.button.interactable = val;
-            card.canDrag = val;
+            card.button.interactable = drawVal;
+            card.canDrag = drawVal;
         }
+        if(areaVal) { placeArea.layer = GameManager.Instance.UILayer; }
+        else { placeArea.layer =  GameManager.Instance.IgnoreLayer; }
     }
 
-    public void setPlayerClickAndDrag(bool clickVal, bool dragVal)
+    public void setPlayerClickDragAndArea(bool clickVal, bool dragVal, bool areaVal)
     {
         foreach(Transform child in playerArea.transform)
         {
@@ -293,10 +316,10 @@ public class CardHandler : MonoBehaviour
                 card.button.interactable = clickVal;
             }
         }
-       playerArea.GetComponent<Rigidbody2D>().simulated = clickVal;
+       playerArea.GetComponent<Rigidbody2D>().simulated = areaVal;
     }
 
-    public void setEnemyClickAndDrag(bool clickVal, bool dragVal)
+    public void setEnemyClickDragAndArea(bool clickVal, bool dragVal, bool areaVal)
     {
         foreach(Transform child in enemyArea.transform)
         {
@@ -308,7 +331,7 @@ public class CardHandler : MonoBehaviour
                 card.button.interactable = clickVal;
             }
         }
-        enemyArea.GetComponent<Rigidbody2D>().simulated = clickVal;
+        enemyArea.GetComponent<Rigidbody2D>().simulated = areaVal;
     }
 
     public void cardPlayed(Card card)
@@ -337,4 +360,20 @@ public class CardHandler : MonoBehaviour
         enemySelectedCard.gameObject.layer = GameManager.Instance.playerLayer;
     }
 
+    public void checkSnapped(GameState who)
+    {
+        int length = placeArea.transform.childCount;
+        if(length >=2 )
+        {
+            int lastPlayedCard = placeArea.transform.GetChild(length-2).GetComponent<Card>().value;
+            int snappedCard =  placeArea.transform.GetChild(length-1).GetComponent<Card>().value;
+            //check for same card values or the special case where red kings have a different value to black kings
+            if(lastPlayedCard == snappedCard || lastPlayedCard == 13 && snappedCard == -1 || lastPlayedCard == 13 && snappedCard == -1)
+            {
+                GameManager.Instance.setGameState(GameState.SNAP_PASS, who);
+                return;
+            }
+        }
+        GameManager.Instance.setGameState(GameState.SNAP_FAIL, who);
+    }
 }
