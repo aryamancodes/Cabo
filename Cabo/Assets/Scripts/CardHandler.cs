@@ -2,12 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class CardHandler : MonoBehaviour
+public class CardHandler : MonoBehaviourPunCallbacks
 {
     //handle the distributing of cards - based on currGameState of the GameManager
     public static CardHandler Instance;
     public Card emptyCard;
+    public CardBase topCard;
     public Sprite playerBack;
     public Sprite enemyBack;
 
@@ -24,19 +27,34 @@ public class CardHandler : MonoBehaviour
 
     public Card played;
     public bool firstDraw = true;
+    public PhotonView view;
 
     void Awake()
     {
         GameManager.gameStateChanged += OnGameStateChanged;
         Instance = this;
         DontDestroyOnLoad(gameObject);
-        //GameManager.Instance.setGameState(GameState.START);
-
     }
 
     void OnDisable()
     {
         GameManager.gameStateChanged -= OnGameStateChanged;
+    }
+
+    void Start()
+    {   
+        if(PhotonNetwork.IsMasterClient)  
+        {
+            view = GetComponent<PhotonView>();
+            view.RPC("generateDeck", RpcTarget.AllBuffered, Random.Range(1,300));
+        }   
+    }
+
+     [PunRPC]
+    public void generateDeck(int seed)
+    {
+        DeckGenerator.Instance.generateDeck(seed);
+        GameManager.Instance.setGameState(GameState.START);
     }
 
 
@@ -46,8 +64,8 @@ public class CardHandler : MonoBehaviour
         var prevState = GameManager.Instance.prevState;
         if(currState == GameState.START)
         {
-            firstDistribute();
             setDrawCardsAndArea(false, false);
+            firstDistribute();
         }
  
         if(currState == GameState.PLAYER_DRAW)
@@ -68,7 +86,7 @@ public class CardHandler : MonoBehaviour
             overrideSpecialCard(currState); 
         }
 
-        if(currState == GameState.PLAY)
+        if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
         {
             setDrawCardsAndArea(false, false);
             setPlayerClickDragAndArea(false, false, false);
@@ -133,57 +151,59 @@ public class CardHandler : MonoBehaviour
                 setEnemyClickDragAndArea(true, true, false);
             }
         }
-
     }
 
-    public void firstDistribute()
+     public void firstDistribute()
     {
         for(int i=0; i<4; ++i)
         {
-            Card playerCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
-            GameObject playerSlot = Instantiate(playerCard.slot, new Vector2(0,0), Quaternion.identity);
-            playerCard.card = DeckGenerator.getCard();
+            GameObject playerCardNetwork = PhotonNetwork.Instantiate(emptyCard.name, new Vector2(0,0), Quaternion.identity);
+            Card playerCard = playerCardNetwork.GetComponent<Card>();
+            GameObject playerSlot = Instantiate(playerCard.slot, new Vector2(0,0), Quaternion.identity); 
+            playerCard.card = DeckGenerator.Instance.getCard();
             playerCard.back = playerBack;
             playerSlot.transform.SetParent(playerArea.transform, false);
             playerCard.transform.SetParent(playerSlot.transform, false);
             playerCard.gameObject.layer = playerArea.layer;
             playerSlot.gameObject.layer = playerArea.layer;
-            if(i%2 == 1)
+            if(i%2 == 1 && PhotonNetwork.IsMasterClient)
             {
                 playerCard.flipCard();
+                playerFlipped = 2;
             }
             else
             {
-                playerCard.button.interactable = false;
+                //playerCard.button.interactable = false;
             }
-            playerFlipped = 2;
-            
-            
-            Card enemyCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
+                
+            GameObject enemyCardNetwork = PhotonNetwork.Instantiate(emptyCard.name, new Vector2(0,0), Quaternion.identity);
+            Card enemyCard = enemyCardNetwork.GetComponent<Card>();
             GameObject enemySlot = Instantiate(enemyCard.slot, new Vector2(0,0), Quaternion.identity);
-            enemyCard.card = DeckGenerator.getCard();
+            enemyCard.card = DeckGenerator.Instance.getCard();
             enemyCard.back = enemyBack;
             enemySlot.transform.SetParent(enemyArea.transform, false);
             enemyCard.transform.SetParent(enemySlot.transform, false);
             enemyCard.gameObject.layer = enemyArea.layer;
             enemySlot.gameObject.layer = enemyArea.layer;
-            if(i%2 == 0)
+            if(i%2 == 0 && !PhotonNetwork.IsMasterClient)
             {
                 enemyCard.flipCard();
+                enemyFlipped = 2;
+
             }
             else
             {
-                enemyCard.button.interactable = false;
+                //enemyCard.button.interactable = false;
             }
-            enemyFlipped = 2;
         }
     }
+   
 
     public void Button_onDrawCard()
     {
         Card drawnCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
         GameObject slot = Instantiate(emptyCard.slot, new Vector2(0,0), Quaternion.identity); 
-        drawnCard.card = DeckGenerator.getCard();
+        drawnCard.card = DeckGenerator.Instance.getCard();
         if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
         {
             slot.layer = GameManager.Instance.playerLayer;

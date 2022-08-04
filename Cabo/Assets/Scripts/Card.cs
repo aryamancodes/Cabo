@@ -37,7 +37,7 @@ public class Card : MonoBehaviour
             image.sprite = back;
         }
 
-    } 
+    }
 
     public void flipCard()
     {
@@ -69,10 +69,6 @@ public class Card : MonoBehaviour
 
     public void cardClicked()
     {
-        // if(this == CardHandler.Instance.playerSelectedCard || this == CardHandler.Instance.enemySelectedCard)
-        // {
-        //     return;
-        // }
         if(gameObject.layer == GameManager.Instance.playerLayer)
         {
             playerCardClicked();
@@ -95,23 +91,23 @@ public class Card : MonoBehaviour
             case GameState.START:
             {
                 flipCard();
-                button.interactable = false;
-                --CardHandler.Instance.playerFlipped;
-                if(CardHandler.Instance.playerFlipped == 0)
-                {
-                    GameManager.Instance.setGameState(GameState.PLAYER_READY);
-                }   
+                // button.interactable = false;
+                // --CardHandler.Instance.playerFlipped;
+                // if(CardHandler.Instance.playerFlipped == 0)
+                // {
+                //     GameManager.Instance.setGameState(GameState.PLAYER_READY);
+                // }   
                 break;
             }
             case GameState.ENEMY_READY:
             {
                 flipCard();
-                button.interactable = false;
-                --CardHandler.Instance.playerFlipped;
-                if(CardHandler.Instance.playerFlipped == 0)
-                {
-                    GameManager.Instance.setGameState(GameState.PLAYER_READY);
-                }
+                // button.interactable = false;
+                // --CardHandler.Instance.playerFlipped;
+                // if(CardHandler.Instance.playerFlipped == 0)
+                // {
+                //     GameManager.Instance.setGameState(GameState.PLAYER_READY);
+                // }
                 break;
             }
             case GameState.PLAYER_DRAW:
@@ -180,23 +176,23 @@ public class Card : MonoBehaviour
             case GameState.START:
             {
                 flipCard();
-                button.interactable = false;
-                --CardHandler.Instance.enemyFlipped;
-                if(CardHandler.Instance.enemyFlipped == 0)
-                {
-                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
-                }   
+                //button.interactable = false;
+                // --CardHandler.Instance.enemyFlipped;
+                // if(CardHandler.Instance.enemyFlipped == 0)
+                // {
+                //     GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                // }   
                 break;
             }
             case GameState.PLAYER_READY:
             {
                 flipCard();
-                button.interactable = false;
-                --CardHandler.Instance.enemyFlipped;
-                if(CardHandler.Instance.enemyFlipped == 0)
-                {
-                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
-                }
+                // button.interactable = false;
+                // --CardHandler.Instance.enemyFlipped;
+                // if(CardHandler.Instance.enemyFlipped == 0)
+                // {
+                //     GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                // }
                 break;
             }
             case GameState.ENEMY_DRAW:

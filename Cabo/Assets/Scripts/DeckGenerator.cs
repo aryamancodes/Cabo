@@ -2,19 +2,26 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
-using System.Security.Cryptography;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class DeckGenerator: MonoBehaviour
+public class DeckGenerator: MonoBehaviourPunCallbacks
 {
+    public static DeckGenerator Instance;
+    
     public List<Sprite> heartCards = new List<Sprite>();
     public List<Sprite> diamondCards = new List<Sprite>();
     public List<Sprite> spadeCards = new List<Sprite>();
     public List<Sprite> clubCards = new List<Sprite>();
     public List<Sprite> jokers = new List<Sprite>(); 
     
-    public static List<CardBase> deck = new List<CardBase>();
+    public List<CardBase> deck = new List<CardBase>();
 
     void Awake()
+    {
+        Instance = this;
+    }
+    public void generateDeck(int seed)
     {
         Dictionary< CardBase.Suit, List<Sprite> > dict = new Dictionary< CardBase.Suit, List<Sprite> >();
         dict.Add(CardBase.Suit.Heart, heartCards);
@@ -48,29 +55,25 @@ public class DeckGenerator: MonoBehaviour
                 deck.Add(CardBase.CreateInstance(dict[suit][i], i+1, suit, special));
             }
         }
-        System.Random rng = new System.Random();
-        Shuffle(deck);
+        Shuffle(deck, seed);
     }
 
     //Fisher-Yates shuffle in-place
-    void Shuffle(List<CardBase> list)
+    void Shuffle(List<CardBase> list, int seed)
     {
-        RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+        var rng = new System.Random(seed);
         int n = list.Count;
         while (n > 1)
         {
-            byte[] box = new byte[1];
-            do provider.GetBytes(box);
-            while (!(box[0] < n * (Byte.MaxValue / n)));
-            int k = (box[0] % n);
-            n--;
-            var value = list[k];
+             n--;
+            int k = rng.Next(n + 1);
+            CardBase value = list[k];
             list[k] = list[n];
             list[n] = value;
         }
     }
 
-    public static CardBase getCard()
+    public CardBase getCard()
     {
         var card = deck[0];
         deck.RemoveAt(0);

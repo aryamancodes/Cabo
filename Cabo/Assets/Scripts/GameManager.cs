@@ -33,7 +33,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        setGameState(GameState.START);
+        //setGameState(GameState.START);
     }
 
     //set the current state of the FSM. Optionally set the prev state without sending event to subsrcibers

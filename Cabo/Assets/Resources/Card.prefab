@@ -73,7 +73,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 05568b408f8c74149948e47a0a6c6cbd, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 230fc61a1b1bf4671ad7e096b2e551a7, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -96,14 +96,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   image: {fileID: 5810423015560917803}
-  card: {fileID: 11400000, guid: 56ddf5e9f3bfc40d5be6e3c6f408c49a, type: 2}
+  card: {fileID: 0}
   back: {fileID: 21300000, guid: 230fc61a1b1bf4671ad7e096b2e551a7, type: 3}
   slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
   faceUp: 0
   button: {fileID: 7049321018006798974}
-  face: {fileID: 0}
-  suit: 0
-  value: 0
+  face: {fileID: 21300000, guid: 28c93171198ff47daad33a6491f28891, type: 3}
+  suit: 3
+  value: 3
   isSpecialCard: 0
   canDrag: 0
 --- !u!114 &7049321018006798974
@@ -298,7 +298,7 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 3
+  Synchronization: 1
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents: []

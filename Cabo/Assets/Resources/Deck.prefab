@@ -149,6 +149,7 @@ GameObject:
   - component: {fileID: 5361223922839690663}
   - component: {fileID: 5361223922839690662}
   - component: {fileID: 5361223922839690659}
+  - component: {fileID: -7666131736790566474}
   m_Layer: 5
   m_Name: Deck
   m_TagString: Untagged
@@ -227,12 +228,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f1cd5df6b96c4d00916a6ca158ea8f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emptyPlayerCard: {fileID: 7746321002957887508, guid: 22e357217fe294cc9aa9ef56007c3447, type: 3}
-  emptyEnemyCard: {fileID: -8825698727873679524, guid: fe7ef28f5d5b846ffbc567b3725ca6d0, type: 3}
+  emptyCard: {fileID: 0}
+  playerBack: {fileID: 0}
+  enemyBack: {fileID: 0}
+  toInstantiate: {fileID: 0}
   playerArea: {fileID: 3202214032203851826, guid: 0fe8f622d87c94496ae209837b3ab61b, type: 3}
   enemyArea: {fileID: 184433518691668692, guid: 79b53c304849f4bd3a91ad1543f0e23b, type: 3}
-  deck: []
-  grid: {fileID: 0}
+  placeArea: {fileID: 0}
+  deck: {fileID: 0}
+  playerFlipped: 0
+  enemyFlipped: 0
+  playerSelectedCard: {fileID: 0}
+  enemySelectedCard: {fileID: 0}
+  played: {fileID: 0}
+  firstDraw: 1
+  view: {fileID: 0}
 --- !u!114 &5361223922839690662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -360,3 +370,26 @@ MonoBehaviour:
   jokers:
   - {fileID: 21300000, guid: c59a2d425f94348a8a4ec0e345f68e8a, type: 3}
   - {fileID: 21300000, guid: 039cef3294625470d88d85b0a7f92599, type: 3}
+--- !u!114 &-7666131736790566474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5361223922839690661}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 0
+  ObservedComponents:
+  - {fileID: 0}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0

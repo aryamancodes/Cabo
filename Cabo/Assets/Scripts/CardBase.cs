@@ -30,4 +30,5 @@ public class CardBase : ScriptableObject
        data.Init(face, value, suit, isSpecialCard);
        return data;
     }
+
 }

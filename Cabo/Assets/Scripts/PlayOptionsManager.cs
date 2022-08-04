@@ -24,9 +24,7 @@ public class PlayOptionsManager : MonoBehaviour
         { GameState.BLIND_SWAP2, new List<string>{"Select one of the opponent's cards to swap!", "Waiting for opponent to swap cards!"} },
         { GameState.SWAP1, new List<string>{"Select one of your cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
         { GameState.SWAP2, new List<string>{"Select one of the opponent's cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
-        { GameState.SNAP_PASS, new List<string>{"You've succesfully snapped a card !", "Click on the flipped cards when you're ready!"} },
-
-
+        { GameState.SNAP_PASS, new List<string>{"You've succesfully snapped a card :) Drag one of your cards into the opponent's area", "Your card got snapped!"} },
     };
 
     void Awake()
