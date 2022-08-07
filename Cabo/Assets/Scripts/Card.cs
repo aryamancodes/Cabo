@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
 public class Card : MonoBehaviour
 {
     public Image image;
@@ -13,20 +12,22 @@ public class Card : MonoBehaviour
 
     public Button button;
     public Sprite face;
+    public Sprite face_hidden;
+    
     public CardBase.Suit suit;
     public int value;
     public bool isSpecialCard;
     public bool canDrag = false;
-
+    public bool isHidden = false;
 
     void Start()
     {
-        if(this.card != null)
+        if(card != null)
         {
-            this.face = card.face;
-            this.suit = card.suit;
-            this.value = card.value;
-            this.isSpecialCard = card.isSpecialCard;
+            face = card.face;
+            suit = card.suit;
+            value = card.value;
+            isSpecialCard = card.isSpecialCard;
         } 
         if(faceUp)
         {
@@ -36,35 +37,60 @@ public class Card : MonoBehaviour
         {
             image.sprite = back;
         }
-
     }
 
-    public void flipCard()
+    public int getIndex()
     {
-        if(faceUp)
+        int layer = gameObject.layer;
+        if(layer == GameManager.Instance.playerLayer || layer == GameManager.Instance.enemyLayer)
         {
-            image.sprite = back;
-            
+            return transform.parent.GetSiblingIndex();
         }
-        else
-        {
-            image.sprite = face;
+        return transform.GetSiblingIndex();
+    }
+    public int flipCard(bool hidden)
+    {
+        int index = getIndex();
+        if(faceUp) { image.sprite = back; }
+        if(!faceUp && hidden) 
+        { 
+            image.sprite = face_hidden; 
+            isHidden =true;
         }
+        if(!faceUp && !hidden) 
+        { 
+            image.sprite = face; 
+            isHidden = false;
+        }
+
         faceUp = !faceUp;
+        return getIndex();
     }
 
-    public void flipCard(string direction)
+    public int flipCard(string direction, bool hidden)
     {
         if(direction == "down")
         {
             image.sprite = back;
             faceUp = false;
+
+        }
+        else if(direction == "up" && hidden)
+        {
+            image.sprite = face_hidden;
+            faceUp = true;
+            Debug.Log("HIDDEN flipCard on " + getIndex() + " " + gameObject.layer);
+            isHidden = true;
+
         }
         else if(direction == "up")
         {
             image.sprite = face;
             faceUp = true;
+            Debug.Log("NORMAL flipCard on " + getIndex() + " " + gameObject.layer);
+            isHidden = false;
         }
+        return getIndex();
     }
 
     public void cardClicked()
@@ -78,10 +104,6 @@ public class Card : MonoBehaviour
             enemyCardClicked();
         }
     }
-
-
-
-
     public void playerCardClicked()
     {
         var currState = GameManager.Instance.currState;
@@ -90,32 +112,35 @@ public class Card : MonoBehaviour
         {
             case GameState.START:
             {
-                flipCard();
-                // button.interactable = false;
-                // --CardHandler.Instance.playerFlipped;
-                // if(CardHandler.Instance.playerFlipped == 0)
-                // {
-                //     GameManager.Instance.setGameState(GameState.PLAYER_READY);
-                // }   
+                int index = flipCard(false);
+                CardHandler.Instance.Network_playerCardFlipped(index, true);
+                button.interactable = false;
+                --CardHandler.Instance.playerFlipped;
+                if(CardHandler.Instance.playerFlipped == 0)
+                {
+                    GameManager.Instance.setGameState(GameState.PLAYER_READY);
+                    GameManager.Instance.Network_setGameState(GameState.PLAYER_READY);
+                }   
                 break;
             }
             case GameState.ENEMY_READY:
             {
-                flipCard();
-                // button.interactable = false;
-                // --CardHandler.Instance.playerFlipped;
-                // if(CardHandler.Instance.playerFlipped == 0)
-                // {
-                //     GameManager.Instance.setGameState(GameState.PLAYER_READY);
-                // }
+                int index = flipCard(false);
+                CardHandler.Instance.Network_playerCardFlipped(index, true);
+                button.interactable = false;
+                --CardHandler.Instance.playerFlipped;
+                if(CardHandler.Instance.playerFlipped == 0)
+                {
+                    GameManager.Instance.setGameState(GameState.PLAYER_READY);
+                    GameManager.Instance.Network_setGameState(GameState.PLAYER_READY);
+                }
                 break;
             }
             case GameState.PLAYER_DRAW:
             {
-                Debug.Log("reaching hrere");
-                if(this.faceUp == true)
+                if(faceUp == true)
                 {
-                    flipCard();
+                    //flipCard();
                     button.interactable = false;
                     GameManager.Instance.setGameState(GameState.PLAYER_TURN);
                 }
@@ -123,14 +148,14 @@ public class Card : MonoBehaviour
             }
             case GameState.PEAK_PLAYER:
             {
-                flipCard();
+                //flipCard();
                 CardHandler.Instance.playerSelectedCard = this;
                 GameManager.Instance.setGameState(GameState.PLAY, GameState.PLAYER_TURN);
                 break;
             }
             case GameState.PEAK_ENEMY:
             {
-                flipCard();
+                //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
                 GameManager.Instance.setGameState(GameState.PLAY, prevState);
                 break;
@@ -150,14 +175,14 @@ public class Card : MonoBehaviour
             }
             case GameState.SWAP1:
             {
-                flipCard();
+                //flipCard();
                 CardHandler.Instance.playerSelectedCard = this;
                 GameManager.Instance.setGameState(GameState.SWAP2, prevState);
                 break;
             }
             case GameState.SWAP2:
             {
-                flipCard();
+                //flipCard();
                 CardHandler.Instance.playerSelectedCard = this;
                 CardHandler.Instance.cardPlayed(null);                
                 GameManager.Instance.setGameState(GameState.SPECIAL_PLAY, prevState);
@@ -175,31 +200,35 @@ public class Card : MonoBehaviour
         {
             case GameState.START:
             {
-                flipCard();
-                //button.interactable = false;
-                // --CardHandler.Instance.enemyFlipped;
-                // if(CardHandler.Instance.enemyFlipped == 0)
-                // {
-                //     GameManager.Instance.setGameState(GameState.ENEMY_READY);
-                // }   
+                int index = flipCard(false);
+                CardHandler.Instance.Network_enemyCardFlipped(index, true);
+                button.interactable = false;
+                --CardHandler.Instance.enemyFlipped;
+                if(CardHandler.Instance.enemyFlipped == 0)
+                {
+                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                    GameManager.Instance.Network_setGameState(GameState.ENEMY_READY);
+                }   
                 break;
             }
             case GameState.PLAYER_READY:
             {
-                flipCard();
-                // button.interactable = false;
-                // --CardHandler.Instance.enemyFlipped;
-                // if(CardHandler.Instance.enemyFlipped == 0)
-                // {
-                //     GameManager.Instance.setGameState(GameState.ENEMY_READY);
-                // }
+                int index = flipCard(false);
+                CardHandler.Instance.Network_enemyCardFlipped(index, true);
+                button.interactable = false;
+                --CardHandler.Instance.enemyFlipped;
+                if(CardHandler.Instance.enemyFlipped == 0)
+                {
+                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                    GameManager.Instance.Network_setGameState(GameState.ENEMY_READY);
+                }
                 break;
             }
             case GameState.ENEMY_DRAW:
             {
-                if(this.faceUp == true)
+                if(faceUp == true)
                 {
-                    flipCard();
+                    //flipCard();
                     button.interactable = false;
                     GameManager.Instance.setGameState(GameState.ENEMY_TURN);
                 }
@@ -207,7 +236,7 @@ public class Card : MonoBehaviour
             }
             case GameState.PEAK_PLAYER:
             {
-                flipCard();                
+                //flipCard();                
                 CardHandler.Instance.playerSelectedCard = this;
                 GameManager.Instance.setGameState(GameState.PLAY, prevState);
                 break;
@@ -215,7 +244,7 @@ public class Card : MonoBehaviour
             }
             case GameState.PEAK_ENEMY:
             {
-                flipCard();
+                //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
                 GameManager.Instance.setGameState(GameState.PLAY, prevState);
                 break;
@@ -236,14 +265,14 @@ public class Card : MonoBehaviour
             }
             case GameState.SWAP1:
             {
-                flipCard();
+                //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
                 GameManager.Instance.setGameState(GameState.SWAP2, prevState);
                 break;
             }
             case GameState.SWAP2:
             {
-                flipCard();
+                //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
                 CardHandler.Instance.cardPlayed(null);                
                 GameManager.Instance.setGameState(GameState.SPECIAL_PLAY, prevState);

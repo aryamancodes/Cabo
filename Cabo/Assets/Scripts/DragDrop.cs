@@ -17,7 +17,7 @@ public class DragDrop : MonoBehaviour
 
     void Start()
     {
-        card = gameObject.GetComponent<Card>();
+        card = GetComponent<Card>();
         canvas = GameObject.Find("Canvas");
         placeCard = GameObject.Find("Place Card");
         slot = GameObject.Find("Slot");
@@ -47,7 +47,7 @@ public class DragDrop : MonoBehaviour
 
     public void setStartParent()
     {
-        startParent = this.transform.parent.gameObject;
+        startParent = transform.parent.gameObject;
     }
     public void startDrag()
     {
@@ -75,8 +75,8 @@ public class DragDrop : MonoBehaviour
                     transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
                     transform.gameObject.layer = dropZone.layer;
                     transform.SetParent(placeCard.transform);
-                    Card played = transform.gameObject.GetComponent<Card>();
-                    played.flipCard("up");
+                    Card played = transform.GetComponent<Card>();
+                    played.flipCard("up", false);
                     //FIXME: Correctly detect who snaps the card
                     if(GameManager.Instance.currState == GameState.PLAYER_DRAW || GameManager.Instance.currState == GameState.ENEMY_DRAW)
                     {
@@ -122,13 +122,13 @@ public class DragDrop : MonoBehaviour
         CardHandler.Instance.setDrawCardsAndArea(false, false);
         if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
         { 
-            CardHandler.Instance.playerSelectedCard = this.gameObject.GetComponent<Card>();
+            CardHandler.Instance.playerSelectedCard =  GetComponent<Card>();
             CardHandler.Instance.setPlayerClickDragAndArea(false, false, false); 
             CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
         }
         else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
         {
-            CardHandler.Instance.enemySelectedCard = this.gameObject.GetComponent<Card>();
+            CardHandler.Instance.enemySelectedCard = GetComponent<Card>();
             CardHandler.Instance.setEnemyClickDragAndArea(false, false, false); 
             CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
         }

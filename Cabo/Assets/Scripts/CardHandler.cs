@@ -42,11 +42,11 @@ public class CardHandler : MonoBehaviourPunCallbacks
     }
 
     void Start()
-    {   
+    {
+        view = GetComponent<PhotonView>();
         if(PhotonNetwork.IsMasterClient)  
         {
-            view = GetComponent<PhotonView>();
-            view.RPC("generateDeck", RpcTarget.AllBuffered, Random.Range(1,300));
+            view.RPC("generateDeck", RpcTarget.All, Random.Range(1,300));
         }   
     }
 
@@ -60,6 +60,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
     public void OnGameStateChanged()
     {
+        Debug.Log("event game state changed called");
         var currState = GameManager.Instance.currState;
         var prevState = GameManager.Instance.prevState;
         if(currState == GameState.START)
@@ -153,12 +154,39 @@ public class CardHandler : MonoBehaviourPunCallbacks
         }
     }
 
+    //wrappers allowing the Photon RPCs to be called from any class
+    public void Network_playerCardFlipped(int index, bool hidden, string direction="")
+    {
+        view.RPC(nameof(RPC_playerCardFlipped), RpcTarget.Others, index, hidden, direction);
+    }
+    public void Network_enemyCardFlipped(int index, bool hidden, string direction="")
+    {
+        view.RPC(nameof(RPC_enemyCardFlipped), RpcTarget.Others, index, hidden, direction);
+    }
+
+    //Photon RPC functions
+    
+    [PunRPC]
+    public void RPC_playerCardFlipped(int index, bool hidden, string direction)
+    {
+        //if(PhotonNetwork.IsMasterClient){ return; }
+        if(direction != "") { playerArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(direction, hidden); }
+        else { playerArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(hidden); }   
+    }
+
+    [PunRPC]
+    public void RPC_enemyCardFlipped(int index, bool hidden, string direction)
+    {
+        if (direction != "") { enemyArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(direction, hidden); }
+        else { enemyArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(hidden); }
+    }
+
+
      public void firstDistribute()
     {
         for(int i=0; i<4; ++i)
-        {
-            GameObject playerCardNetwork = PhotonNetwork.Instantiate(emptyCard.name, new Vector2(0,0), Quaternion.identity);
-            Card playerCard = playerCardNetwork.GetComponent<Card>();
+        {    
+            Card playerCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject playerSlot = Instantiate(playerCard.slot, new Vector2(0,0), Quaternion.identity); 
             playerCard.card = DeckGenerator.Instance.getCard();
             playerCard.back = playerBack;
@@ -166,18 +194,15 @@ public class CardHandler : MonoBehaviourPunCallbacks
             playerCard.transform.SetParent(playerSlot.transform, false);
             playerCard.gameObject.layer = playerArea.layer;
             playerSlot.gameObject.layer = playerArea.layer;
-            if(i%2 == 1 && PhotonNetwork.IsMasterClient)
+             if(i%2 == 1 && PhotonNetwork.IsMasterClient)
             {
-                playerCard.flipCard();
-                playerFlipped = 2;
+                playerCard.flipCard("up", false);
             }
-            else
-            {
-                //playerCard.button.interactable = false;
-            }
+            else { playerCard.button.interactable = false; }
+            playerFlipped = 2;     
+
                 
-            GameObject enemyCardNetwork = PhotonNetwork.Instantiate(emptyCard.name, new Vector2(0,0), Quaternion.identity);
-            Card enemyCard = enemyCardNetwork.GetComponent<Card>();
+            Card enemyCard  = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject enemySlot = Instantiate(enemyCard.slot, new Vector2(0,0), Quaternion.identity);
             enemyCard.card = DeckGenerator.Instance.getCard();
             enemyCard.back = enemyBack;
@@ -187,15 +212,33 @@ public class CardHandler : MonoBehaviourPunCallbacks
             enemySlot.gameObject.layer = enemyArea.layer;
             if(i%2 == 0 && !PhotonNetwork.IsMasterClient)
             {
-                enemyCard.flipCard();
-                enemyFlipped = 2;
+                enemyCard.flipCard("up", false);
+            }
+            else { enemyCard.button.interactable = false; }
+            enemyFlipped = 2;
 
-            }
-            else
-            {
-                //enemyCard.button.interactable = false;
-            }
         }
+        // if(!PhotonNetwork.IsMasterClient)
+        // {
+        //     var card1 = playerArea.transform.GetChild(1).GetChild(0).GetComponent<Card>();
+        //     card1.flipCard(true);
+        //     card1.button.interactable = true;
+        //     var card2 = playerArea.transform.GetChild(3).GetChild(0).GetComponent<Card>();
+        //     card2.flipCard(true);
+        //     card2.button.interactable = true;
+
+        //     var card3 = enemyArea.transform.GetChild(0).GetChild(0).GetComponent<Card>();
+        //     card3.flipCard(false);
+        //     card3.button.interactable = false;
+        //     var card4 = enemyArea.transform.GetChild(2).GetChild(0).GetComponent<Card>();
+        //     card4.flipCard(false);
+        //     card4.button.interactable = false;
+        // }
+        // else
+        // {
+
+        // }
+
     }
    
 
@@ -233,13 +276,13 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(playerCard != null) 
         {
             card = playerCard.transform; 
-            playerCard.flipCard();
+            //playerCard.//flipCard();
 
         }
         else 
         { 
             card = enemyCard.transform;
-            enemyCard.flipCard();
+            //enemyCard.//flipCard();
         }
         //insert into existing slot
         foreach(Transform child in area.transform)
@@ -295,7 +338,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
     {
         if(playerSelectedCard != null)
         {
-            playerSelectedCard.flipCard("down");
+            playerSelectedCard.flipCard("down", false);
             playerSelectedCard.button.interactable = false;
             playerSelectedCard.canDrag = false;
             playerSelectedCard = null;
@@ -303,7 +346,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
         if(enemySelectedCard != null)
         {
-            enemySelectedCard.flipCard("down");
+            enemySelectedCard.flipCard("down", false);
             enemySelectedCard.button.interactable = false;
             enemySelectedCard.canDrag = false;
             enemySelectedCard = null;

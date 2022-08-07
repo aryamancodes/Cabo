@@ -10,8 +10,6 @@ using Photon.Realtime;
 
 public class MenuManager : MonoBehaviourPunCallbacks
 {
-    
-    public static MenuManager Instance;
     public List<Menu> menus;
     public TMP_InputField username_input;
     public TMP_InputField roomname_input;
@@ -23,17 +21,11 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public TMP_Text roomname_text;
     public TMP_Text lobbyname_text;
     public TMP_Text error_text;
-    public GameObject lobby;
-    // public GameObject lobbyPlayer;
-    // public TMP_Text lobbyPlayer_text;
+    public GameObject lobby; 
     public Button startButton;
 
 
     public bool firstLogin = true;
-    void Awake()
-    {
-        Instance = this;
-    }
 
     void Start()
     {

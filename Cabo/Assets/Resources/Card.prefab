@@ -17,7 +17,7 @@ GameObject:
   - component: {fileID: 8027673762274384217}
   - component: {fileID: -7763341921091130729}
   - component: {fileID: -7523415434540078743}
-  - component: {fileID: -4406760889487829736}
+  - component: {fileID: 1241931177397881618}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -102,10 +102,12 @@ MonoBehaviour:
   faceUp: 0
   button: {fileID: 7049321018006798974}
   face: {fileID: 21300000, guid: 28c93171198ff47daad33a6491f28891, type: 3}
+  face_hidden: {fileID: 21300000, guid: 9f8986b20ad7b4c75889c975bea90f26, type: 3}
   suit: 3
   value: 3
   isSpecialCard: 0
   canDrag: 0
+  isHidden: 1
 --- !u!114 &7049321018006798974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,7 +285,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 70, y: 90}
   m_EdgeRadius: 0
---- !u!114 &-4406760889487829736
+--- !u!114 &1241931177397881618
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -298,9 +300,9 @@ MonoBehaviour:
   ObservedComponentsFoldoutOpen: 1
   Group: 0
   prefixField: -1
-  Synchronization: 1
+  Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 2
+  observableSearch: 1
   ObservedComponents: []
   sceneViewId: 0
   InstantiationId: 0

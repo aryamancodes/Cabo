@@ -8,7 +8,6 @@ using UnityEngine;
 public class CardBase : ScriptableObject
 {
     public Sprite face;
-
     public int value;
 
     public enum Suit {Heart, Diamond, Spade, Club, Joker}
@@ -30,5 +29,4 @@ public class CardBase : ScriptableObject
        data.Init(face, value, suit, isSpecialCard);
        return data;
     }
-
 }
