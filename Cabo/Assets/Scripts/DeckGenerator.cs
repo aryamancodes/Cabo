@@ -5,6 +5,10 @@ using System;
 using Photon.Pun;
 using Photon.Realtime;
 
+/*
+    Static class to generate and uniqely distribute a deck of CardBase objects
+    based on a seed.
+*/
 public class DeckGenerator: MonoBehaviourPunCallbacks
 {
     public static DeckGenerator Instance;

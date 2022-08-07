@@ -5,12 +5,15 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
+
+/*
+    Static class that handles the distributing, flipping and other
+    player/enemy interactions with cards. 
+*/
 public class CardHandler : MonoBehaviourPunCallbacks
 {
-    //handle the distributing of cards - based on currGameState of the GameManager
     public static CardHandler Instance;
-    public Card emptyCard;
-    public CardBase topCard;
+    public Card emptyCard; 
     public Sprite playerBack;
     public Sprite enemyBack;
 
@@ -26,7 +29,6 @@ public class CardHandler : MonoBehaviourPunCallbacks
     public Card enemySelectedCard = null;
 
     public Card played;
-    public bool firstDraw = true;
     public PhotonView view;
 
     void Awake()
@@ -50,7 +52,8 @@ public class CardHandler : MonoBehaviourPunCallbacks
         }   
     }
 
-     [PunRPC]
+    // Generate the same unique deck across all clients
+    [PunRPC]
     public void generateDeck(int seed)
     {
         DeckGenerator.Instance.generateDeck(seed);
@@ -60,7 +63,6 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
     public void OnGameStateChanged()
     {
-        Debug.Log("event game state changed called");
         var currState = GameManager.Instance.currState;
         var prevState = GameManager.Instance.prevState;
         if(currState == GameState.START)
@@ -154,7 +156,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         }
     }
 
-    //wrappers allowing the Photon RPCs to be called from any class
+    // Static wrappers and RPCs for flipping a card
     public void Network_playerCardFlipped(int index, bool hidden, string direction="")
     {
         view.RPC(nameof(RPC_playerCardFlipped), RpcTarget.Others, index, hidden, direction);
@@ -163,8 +165,6 @@ public class CardHandler : MonoBehaviourPunCallbacks
     {
         view.RPC(nameof(RPC_enemyCardFlipped), RpcTarget.Others, index, hidden, direction);
     }
-
-    //Photon RPC functions
     
     [PunRPC]
     public void RPC_playerCardFlipped(int index, bool hidden, string direction)
@@ -214,31 +214,13 @@ public class CardHandler : MonoBehaviourPunCallbacks
             {
                 enemyCard.flipCard("up", false);
             }
-            else { enemyCard.button.interactable = false; }
+            else
+            {
+                enemyCard.button.interactable = false;
+            }
             enemyFlipped = 2;
 
         }
-        // if(!PhotonNetwork.IsMasterClient)
-        // {
-        //     var card1 = playerArea.transform.GetChild(1).GetChild(0).GetComponent<Card>();
-        //     card1.flipCard(true);
-        //     card1.button.interactable = true;
-        //     var card2 = playerArea.transform.GetChild(3).GetChild(0).GetComponent<Card>();
-        //     card2.flipCard(true);
-        //     card2.button.interactable = true;
-
-        //     var card3 = enemyArea.transform.GetChild(0).GetChild(0).GetComponent<Card>();
-        //     card3.flipCard(false);
-        //     card3.button.interactable = false;
-        //     var card4 = enemyArea.transform.GetChild(2).GetChild(0).GetComponent<Card>();
-        //     card4.flipCard(false);
-        //     card4.button.interactable = false;
-        // }
-        // else
-        // {
-
-        // }
-
     }
    
 
@@ -304,34 +286,36 @@ public class CardHandler : MonoBehaviourPunCallbacks
         card.gameObject.layer = area.layer;
     }
 
-    //if a card is drawn and not played immediately, it is no longer special
+    // If a card is drawn and not played immediately, it is no longer special.
+    // This function disables the speciality of such cards.
     public void overrideSpecialCard(GameState curr)
     {
-        // if(curr == GameState.PLAYER_DRAW)
-        // {
-        //     foreach(Transform child in enemyArea.transform)
-        //     {
-        //         if(child.childCount != 0)
-        //         {
-        //             child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
-        //         }
-        //     }
+        if(curr == GameState.PLAYER_DRAW)
+        {
+            foreach(Transform child in enemyArea.transform)
+            {
+                if(child.childCount != 0)
+                {
+                    child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
+                }
+            }
 
-        // }
-        // if(curr == GameState.ENEMY_DRAW)
-        // {
-        //     foreach(Transform child in playerArea.transform)
-        //     {
-        //         if(child.childCount != 0)
-        //         {
-        //             child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
-        //         }
-        //     }
+        }
+        if(curr == GameState.ENEMY_DRAW)
+        {
+            foreach(Transform child in playerArea.transform)
+            {
+                if(child.childCount != 0)
+                {
+                    child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
+                }
+            }
+        }
 
-        // foreach(Transform child in placeArea.transform)
-        // {
-        //     child.GetComponent<Card>().card.isSpecialCard = false;
-        // }
+        foreach(Transform child in placeArea.transform)
+        {
+            child.GetComponent<Card>().card.isSpecialCard = false;
+        }
     }
 
     public void flipDownAllCards()

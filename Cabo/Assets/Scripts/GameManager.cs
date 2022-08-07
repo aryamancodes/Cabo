@@ -4,6 +4,8 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
+
+// All the possible game states, seralized as byte to send over the network
 public enum GameState: byte
 { 
     START=0, PLAYER_READY, PLAYER_DRAW, PLAYER_TURN, ENEMY_READY, ENEMY_DRAW, ENEMY_TURN, SNAP_PASS, SNAP_FAIL, 
@@ -12,6 +14,12 @@ public enum GameState: byte
 }
 
 
+/*
+    Static class that represents the state of the game as a finite state machine.
+    Each time the current state is changed, the gameStateChanged event is sent to
+    all subscribers. Additionally, the layers used to identify player and enemy clicks
+    are defined in this class.
+*/
 public class GameManager : MonoBehaviourPunCallbacks
 {
     public static GameManager Instance;
@@ -25,7 +33,6 @@ public class GameManager : MonoBehaviourPunCallbacks
     public int enemyLayer;
     public int UILayer;
     public int IgnoreLayer;
-
     public PhotonView view;
 
     void Awake()
@@ -43,19 +50,8 @@ public class GameManager : MonoBehaviourPunCallbacks
         view = GetComponent<PhotonView>();
     }
 
-    [PunRPC]
-    public void RPC_setGameState(byte newState, byte prev)
-    {
-        GameManager.Instance.setGameState( (GameState)newState, (GameState) prev);
-    }
-
-    public void Network_setGameState(GameState newState, GameState prev=GameState.NONE)
-    {
-        view.RPC(nameof(RPC_setGameState), RpcTarget.Others, (byte)newState, (byte) prev);
-    }
-
-    // Set the current state of the FSM. Optionally set the prev state without sending event to subsrcibers
-    // This is useful to determine which player placed a card, for example during the ALL_TURN stage
+    // Set the current state of the FSM. Optionally set the prev state without sending event to subscriber
+    // This is useful to identify the current players during special states such as swapping.
     public void setGameState(GameState newState, GameState prev=GameState.NONE)
     {
         Debug.Log("NEW GAME STATE " + newState);
@@ -68,6 +64,14 @@ public class GameManager : MonoBehaviourPunCallbacks
             gameStateChanged();
         }
     }
-
-
+    //Static wrapper and RPC to communicate setGameState() over the network
+    public void Network_setGameState(GameState newState, GameState prev=GameState.NONE)
+    {
+        view.RPC(nameof(RPC_setGameState), RpcTarget.Others, (byte)newState, (byte) prev);
+    }
+    [PunRPC]
+    public void RPC_setGameState(byte newState, byte prev)
+    {
+        GameManager.Instance.setGameState( (GameState)newState, (GameState) prev);
+    }
 }

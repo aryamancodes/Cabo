@@ -2,6 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
+/*
+
+    Class attached to each card object, determining the Sprite shown
+    along with how to handle clicks
+
+*/
 public class Card : MonoBehaviour
 {
     public Image image;
@@ -39,6 +46,8 @@ public class Card : MonoBehaviour
         }
     }
 
+    // Find the index of this card. This is used to communicate which 
+    // card has been interacted with, over the network.
     public int getIndex()
     {
         int layer = gameObject.layer;
@@ -48,6 +57,9 @@ public class Card : MonoBehaviour
         }
         return transform.GetSiblingIndex();
     }
+
+    // Flips card, hiding the actual face from a client is necessary.
+    // Returns the index of the card flipped.
     public int flipCard(bool hidden)
     {
         int index = getIndex();
@@ -67,6 +79,8 @@ public class Card : MonoBehaviour
         return getIndex();
     }
 
+    // Flips a card, asserting its direction. Returns the index of the card 
+    // flipped.
     public int flipCard(string direction, bool hidden)
     {
         if(direction == "down")
@@ -93,6 +107,8 @@ public class Card : MonoBehaviour
         return getIndex();
     }
 
+
+    // Handles the clicking of cards during the various game states
     public void cardClicked()
     {
         if(gameObject.layer == GameManager.Instance.playerLayer)

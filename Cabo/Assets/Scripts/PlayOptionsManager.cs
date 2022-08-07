@@ -2,10 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+
+/*
+
+    Class to display the appropriate playing options - based on the currState
+    of the FSM. Play options are both hints and action buttons for special cards.
+*/
 public class PlayOptionsManager : MonoBehaviourPunCallbacks
 {
-    //Display appropriate playing options - based on the currState of the GameManager
-    //Play options are both text hints to the players and action buttons for special cards
     public List<PlayOption> options;
 
 
