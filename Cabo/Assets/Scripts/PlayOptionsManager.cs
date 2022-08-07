@@ -110,25 +110,24 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
          if(currState == GameState.PLAYER_DRAW)
         {
             setHint(player_hint, dict[currState][0]);
-            setHint(enemy_hint, dict[currState][0]);
+            setHint(enemy_hint, dict[currState][1]);
         }
         if(currState == GameState.ENEMY_DRAW)
         {
-            player_hint.Text.text = dict[GameState.PLAYER_DRAW][1];
-            enemy_hint.Text.text = dict[GameState.PLAYER_DRAW][0];
+            setHint(player_hint, dict[GameState.PLAYER_DRAW][1]);
+            setHint(enemy_hint, dict[GameState.PLAYER_DRAW][0]);
         }
 
         if(currState == GameState.PLAYER_TURN)
         {
-            player_hint.Text.text = dict[currState][0];
-            enemy_hint.Text.text = dict[currState][1];
+            setHint(player_hint, dict[currState][0]);
+            setHint(enemy_hint, dict[currState][1]);
         }
 
         if(currState == GameState.ENEMY_TURN)
         {
-            player_hint.Text.text = dict[GameState.PLAYER_TURN][1];
-            enemy_hint.Text.text = dict[GameState.PLAYER_TURN][0];
-
+            setHint(player_hint, dict[GameState.PLAYER_TURN][1]);
+            setHint(enemy_hint, dict[GameState.PLAYER_TURN][0]);
         }
 
 
@@ -136,13 +135,13 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         {
             if(prevState == GameState.PLAYER_TURN)
             {
-                player_hint.Text.text = dict[currState][0];
-                enemy_hint.Text.text = dict[currState][1];
+                setHint(player_hint, dict[currState][0]);
+                setHint(enemy_hint, dict[currState][1]);
             }
             else if(prevState == GameState.ENEMY_TURN)
             {
-                player_hint.Text.text = dict[currState][1];
-                enemy_hint.Text.text = dict[currState][0]; 
+                setHint(player_hint, dict[currState][1]);
+                setHint(enemy_hint, dict[currState][0]);
             }
             showOption("end_turn");
         }
@@ -182,13 +181,13 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         {
             if(prevState == GameState.PLAYER_TURN)
             {
-                player_hint.Text.text = dict[currState][0];
-                enemy_hint.Text.text = dict[currState][1];
+                setHint(player_hint, dict[currState][0]);
+                setHint(enemy_hint, dict[currState][1]);
             }
             else if(prevState == GameState.ENEMY_TURN)
             {
-                player_hint.Text.text = dict[currState][1];
-                enemy_hint.Text.text = dict[currState][0];
+                setHint(player_hint, dict[currState][1]);
+                setHint(enemy_hint, dict[currState][0]);
             }
         }
 

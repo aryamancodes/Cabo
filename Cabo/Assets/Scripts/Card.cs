@@ -25,7 +25,6 @@ public class Card : MonoBehaviour
     public int value;
     public bool isSpecialCard;
     public bool canDrag = false;
-    public bool isHidden = false;
 
     void Start()
     {
@@ -61,19 +60,12 @@ public class Card : MonoBehaviour
     // Flips card, hiding the actual face from a client is necessary.
     // Returns the index of the card flipped.
     public int flipCard(bool hidden)
-    {
-        int index = getIndex();
+    {        
         if(faceUp) { image.sprite = back; }
-        if(!faceUp && hidden) 
-        { 
-            image.sprite = face_hidden; 
-            isHidden =true;
-        }
-        if(!faceUp && !hidden) 
-        { 
-            image.sprite = face; 
-            isHidden = false;
-        }
+
+        if(!faceUp && hidden) { image.sprite = face_hidden; }
+
+        if(!faceUp && !hidden) { image.sprite = face; }
 
         faceUp = !faceUp;
         return getIndex();
@@ -93,16 +85,11 @@ public class Card : MonoBehaviour
         {
             image.sprite = face_hidden;
             faceUp = true;
-            Debug.Log("HIDDEN flipCard on " + getIndex() + " " + gameObject.layer);
-            isHidden = true;
-
         }
         else if(direction == "up")
         {
             image.sprite = face;
             faceUp = true;
-            Debug.Log("NORMAL flipCard on " + getIndex() + " " + gameObject.layer);
-            isHidden = false;
         }
         return getIndex();
     }
@@ -148,7 +135,7 @@ public class Card : MonoBehaviour
                 if(CardHandler.Instance.playerFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.PLAYER_READY);
-                    GameManager.Instance.Network_setGameState(GameState.PLAYER_READY);
+                    GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
                 }
                 break;
             }
@@ -236,7 +223,7 @@ public class Card : MonoBehaviour
                 if(CardHandler.Instance.enemyFlipped == 0)
                 {
                     GameManager.Instance.setGameState(GameState.ENEMY_READY);
-                    GameManager.Instance.Network_setGameState(GameState.ENEMY_READY);
+                    GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
                 }
                 break;
             }
