@@ -92,7 +92,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
             setHint(enemy_hint, dict[GameState.PLAYER_READY][1]);
             if(prevState == GameState.ENEMY_READY)
             {
-                GameManager.Instance.setGameState(GameState.PLAYER_DRAW);
+                GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
                 GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
             }
         }
@@ -102,7 +102,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
             setHint(enemy_hint, dict[GameState.PLAYER_READY][0]);
             if(prevState == GameState.PLAYER_READY)
             {
-                GameManager.Instance.setGameState(GameState.PLAYER_DRAW);
+                GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
                 GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
             }
         }

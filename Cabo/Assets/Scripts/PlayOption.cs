@@ -39,34 +39,34 @@ public class PlayOption : MonoBehaviour
         {
             if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
             {
-                GameManager.Instance.setGameState(GameState.ENEMY_DRAW);
+                GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW);
             }
             else
             {
-                GameManager.Instance.setGameState(GameState.PLAYER_DRAW);
+                GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
             }
         }
         if(optionName == "blind_swap")
         {
-            GameManager.Instance.setGameState(GameState.BLIND_SWAP1, prev);
+            GameManager.Instance.Network_setGameState(GameState.BLIND_SWAP1, prev);
         }
 
         if(optionName == "peak_and_swap")
         {
-            GameManager.Instance.setGameState(GameState.SWAP1, prev);
+            GameManager.Instance.Network_setGameState(GameState.SWAP1, prev);
         }
         if(optionName == "swap")
         {
             CardHandler.Instance.swapCards();
-            GameManager.Instance.setGameState(GameState.PLAY, prev);
+            GameManager.Instance.Network_setGameState(GameState.PLAY, prev);
         }
         if(optionName == "peak_player")
         {
-            GameManager.Instance.setGameState(GameState.PEAK_PLAYER, prev);
+            GameManager.Instance.Network_setGameState(GameState.PEAK_PLAYER, prev);
         }
         if(optionName == "peak_enemy")
         {
-            GameManager.Instance.setGameState(GameState.PEAK_ENEMY, prev);
+            GameManager.Instance.Network_setGameState(GameState.PEAK_ENEMY, prev);
         }
     }
 }

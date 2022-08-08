@@ -57,7 +57,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
     public void generateDeck(int seed)
     {
         DeckGenerator.Instance.generateDeck(seed);
-        GameManager.Instance.setGameState(GameState.START);
+        GameManager.Instance.localSetGameState(GameState.START);
     }
 
 
@@ -75,43 +75,27 @@ public class CardHandler : MonoBehaviourPunCallbacks
         {
             flipDownAllCards();
             overrideSpecialCard(); 
-            if(PhotonNetwork.IsMasterClient)
-            {
-                setDrawCardsAndArea(true, true); 
-                setPlayerClickDragAndArea(true, true, true);
-                setEnemyClickDragAndArea(false, false, false);
-            }
-            else 
-            { 
-                setDrawCardsAndArea(false, false); 
-                setPlayerClickDragAndArea(false, false, false);
-                setEnemyClickDragAndArea(false, false, false);
-            }
+            setEnemyClickDragAndArea(false, false, false);
+            setPlayerClickDragAndArea(false, false, true);
+            if(PhotonNetwork.IsMasterClient) { setDrawCardsAndArea(true, true); }
+            else { setDrawCardsAndArea(false, false); }
         }
 
         if(currState == GameState.ENEMY_DRAW)
         {
             flipDownAllCards();
             overrideSpecialCard(); 
-            if(!PhotonNetwork.IsMasterClient)
-            {
-                setDrawCardsAndArea(true, true); 
-                setPlayerClickDragAndArea(false, false, false);
-                setEnemyClickDragAndArea(true, true, true);
-            }
-            else 
-            { 
-                setDrawCardsAndArea(false, false); 
-                setPlayerClickDragAndArea(false, false, false);
-                setEnemyClickDragAndArea(false, false, false);
-            }
+            setPlayerClickDragAndArea(false, false, false);
+            setEnemyClickDragAndArea(false, false, true);
+            if(!PhotonNetwork.IsMasterClient) { setDrawCardsAndArea(true, true); }
+            else { setDrawCardsAndArea(false, false); }
         }
 
         if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
         {
             setDrawCardsAndArea(false, false);
-            setPlayerClickDragAndArea(false, false, false);
-            setEnemyClickDragAndArea(false, false, false);
+            setPlayerClickDragAndArea(true, true, false);
+            setEnemyClickDragAndArea(true, true, false);
         }
 
         if(currState == GameState.PLAYER_TURN)
@@ -245,9 +229,21 @@ public class CardHandler : MonoBehaviourPunCallbacks
             }
         }
     }
-   
+
+
+    [PunRPC]
+    public void RPC_NetworkOnDrawCard()
+    {
+        Button_LocalOnDrawCard();
+    }
 
     public void Button_onDrawCard()
+    {
+        Button_LocalOnDrawCard();
+        view.RPC(nameof(RPC_NetworkOnDrawCard), RpcTarget.Others, null);
+    }
+   
+    public void Button_LocalOnDrawCard()
     {
         Card drawnCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
         GameObject slot = Instantiate(emptyCard.slot, new Vector2(0,0), Quaternion.identity); 
@@ -280,13 +276,22 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(playerCard != null) 
         {
             card = playerCard.transform; 
-            //playerCard.//flipCard();
-
+            if(PhotonNetwork.IsMasterClient) { playerCard.flipCard(false); }
+            else 
+            {
+                playerCard.flipCard(true); 
+                playerCard.button.interactable = false;
+            }
         }
         else 
         { 
             card = enemyCard.transform;
-            //enemyCard.//flipCard();
+            if(!PhotonNetwork.IsMasterClient) { enemyCard.flipCard(true); }
+            else 
+            {
+                enemyCard.flipCard(false); 
+                enemyCard.button.interactable = false;
+            }
         }
         //insert into existing slot
         foreach(Transform child in area.transform)
@@ -405,11 +410,11 @@ public class CardHandler : MonoBehaviourPunCallbacks
         {
             if(card.isSpecialCard)
             {
-                GameManager.Instance.setGameState(GameState.SPECIAL_PLAY);
+                GameManager.Instance.Network_setGameState(GameState.SPECIAL_PLAY);
             }
             else
             {
-                GameManager.Instance.setGameState(GameState.PLAY);
+                GameManager.Instance.Network_setGameState(GameState.PLAY);
             }   
         }
     }
@@ -434,10 +439,10 @@ public class CardHandler : MonoBehaviourPunCallbacks
             //check for same card values or the special case where red kings have a different value to black kings
             if(lastPlayedCard == snappedCard || lastPlayedCard == 13 && snappedCard == -1 || lastPlayedCard == 13 && snappedCard == -1)
             {
-                GameManager.Instance.setGameState(GameState.SNAP_PASS, who);
+                GameManager.Instance.Network_setGameState(GameState.SNAP_PASS, who);
                 return;
             }
         }
-        GameManager.Instance.setGameState(GameState.SNAP_FAIL, who);
+        GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, who);
     }
 }

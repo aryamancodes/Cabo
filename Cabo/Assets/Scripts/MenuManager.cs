@@ -30,7 +30,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
-        GameManager.Instance.setGameState(GameState.NONE);
+        GameManager.Instance.Network_setGameState(GameState.NONE);
         closeAll();
         openMenu("loading");
     }

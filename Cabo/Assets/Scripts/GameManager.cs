@@ -52,7 +52,7 @@ public class GameManager : MonoBehaviourPunCallbacks
 
     // Set the current state of the FSM. Optionally set the prev state without sending event to subscriber
     // This is useful to identify the current players during special states such as swapping.
-    public void setGameState(GameState newState, GameState prev=GameState.NONE)
+    public void localSetGameState(GameState newState, GameState prev=GameState.NONE)
     {
         Debug.Log("NEW GAME STATE " + newState);
         if(prev != GameState.NONE){ prevState = prev; }
@@ -64,14 +64,15 @@ public class GameManager : MonoBehaviourPunCallbacks
             gameStateChanged();
         }
     }
-    //Static wrapper and RPC to communicate setGameState() over the network
+    //Static wrapper and RPC to communicate setGameState() over the locally and over the network
     public void Network_setGameState(GameState newState, GameState prev=GameState.NONE)
     {
+        localSetGameState(newState, prev);
         view.RPC(nameof(RPC_setGameState), RpcTarget.Others, (byte)newState, (byte) prev);
     }
     [PunRPC]
     public void RPC_setGameState(byte newState, byte prev)
     {
-        GameManager.Instance.setGameState( (GameState)newState, (GameState) prev);
+        localSetGameState( (GameState)newState, (GameState) prev);
     }
 }

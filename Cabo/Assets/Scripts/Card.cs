@@ -126,7 +126,6 @@ public class Card : MonoBehaviour
                 --CardHandler.Instance.playerFlipped;
                 if(CardHandler.Instance.playerFlipped == 0)
                 {
-                    GameManager.Instance.setGameState(GameState.PLAYER_READY);
                     GameManager.Instance.Network_setGameState(GameState.PLAYER_READY);
                 }   
                 break;
@@ -139,8 +138,7 @@ public class Card : MonoBehaviour
                 --CardHandler.Instance.playerFlipped;
                 if(CardHandler.Instance.playerFlipped == 0)
                 {
-                    GameManager.Instance.setGameState(GameState.PLAYER_READY);
-                    GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
+                    GameManager.Instance.Network_setGameState(GameState.PLAYER_READY);
                 }
                 break;
             }
@@ -150,7 +148,7 @@ public class Card : MonoBehaviour
                 {
                     //flipCard();
                     button.interactable = false;
-                    GameManager.Instance.setGameState(GameState.PLAYER_TURN);
+                    GameManager.Instance.Network_setGameState(GameState.PLAYER_TURN);
                 }
                 break;
             }
@@ -158,34 +156,34 @@ public class Card : MonoBehaviour
             {
                 //flipCard();
                 CardHandler.Instance.playerSelectedCard = this;
-                GameManager.Instance.setGameState(GameState.PLAY, GameState.PLAYER_TURN);
+                GameManager.Instance.Network_setGameState(GameState.PLAY, GameState.PLAYER_TURN);
                 break;
             }
             case GameState.PEAK_ENEMY:
             {
                 //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
-                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                GameManager.Instance.Network_setGameState(GameState.PLAY, prevState);
                 break;
             }
             case GameState.BLIND_SWAP1:
             {
                 CardHandler.Instance.playerSelectedCard = this;
-                GameManager.Instance.setGameState(GameState.BLIND_SWAP2, prevState);
+                GameManager.Instance.Network_setGameState(GameState.BLIND_SWAP2, prevState);
                 break; 
             }
             case GameState.BLIND_SWAP2:
             {
                 CardHandler.Instance.playerSelectedCard = this;
                 CardHandler.Instance.swapCards();
-                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                GameManager.Instance.Network_setGameState(GameState.PLAY, prevState);
                 break; 
             }
             case GameState.SWAP1:
             {
                 //flipCard();
                 CardHandler.Instance.playerSelectedCard = this;
-                GameManager.Instance.setGameState(GameState.SWAP2, prevState);
+                GameManager.Instance.Network_setGameState(GameState.SWAP2, prevState);
                 break;
             }
             case GameState.SWAP2:
@@ -193,7 +191,7 @@ public class Card : MonoBehaviour
                 //flipCard();
                 CardHandler.Instance.playerSelectedCard = this;
                 CardHandler.Instance.cardPlayed(null);                
-                GameManager.Instance.setGameState(GameState.SPECIAL_PLAY, prevState);
+                GameManager.Instance.Network_setGameState(GameState.SPECIAL_PLAY, prevState);
                 break;
             }
 
@@ -214,7 +212,7 @@ public class Card : MonoBehaviour
                 --CardHandler.Instance.enemyFlipped;
                 if(CardHandler.Instance.enemyFlipped == 0)
                 {
-                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                    GameManager.Instance.Network_setGameState(GameState.ENEMY_READY);
                     GameManager.Instance.Network_setGameState(GameState.ENEMY_READY);
                 }   
                 break;
@@ -227,7 +225,7 @@ public class Card : MonoBehaviour
                 --CardHandler.Instance.enemyFlipped;
                 if(CardHandler.Instance.enemyFlipped == 0)
                 {
-                    GameManager.Instance.setGameState(GameState.ENEMY_READY);
+                    GameManager.Instance.Network_setGameState(GameState.ENEMY_READY);
                     GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
                 }
                 break;
@@ -238,7 +236,7 @@ public class Card : MonoBehaviour
                 {
                     //flipCard();
                     button.interactable = false;
-                    GameManager.Instance.setGameState(GameState.ENEMY_TURN);
+                    GameManager.Instance.Network_setGameState(GameState.ENEMY_TURN);
                 }
                 break;
             }
@@ -246,7 +244,7 @@ public class Card : MonoBehaviour
             {
                 //flipCard();                
                 CardHandler.Instance.playerSelectedCard = this;
-                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                GameManager.Instance.Network_setGameState(GameState.PLAY, prevState);
                 break;
 
             }
@@ -254,28 +252,28 @@ public class Card : MonoBehaviour
             {
                 //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
-                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                GameManager.Instance.Network_setGameState(GameState.PLAY, prevState);
                 break;
 
             }
             case GameState.BLIND_SWAP1:
             {
                 CardHandler.Instance.enemySelectedCard = this;
-                GameManager.Instance.setGameState(GameState.BLIND_SWAP2, prevState);
+                GameManager.Instance.Network_setGameState(GameState.BLIND_SWAP2, prevState);
                 break; 
             }
             case GameState.BLIND_SWAP2:
             {
                 CardHandler.Instance.enemySelectedCard = this;
                 CardHandler.Instance.swapCards();
-                GameManager.Instance.setGameState(GameState.PLAY, prevState);
+                GameManager.Instance.Network_setGameState(GameState.PLAY, prevState);
                 break; 
             }
             case GameState.SWAP1:
             {
                 //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
-                GameManager.Instance.setGameState(GameState.SWAP2, prevState);
+                GameManager.Instance.Network_setGameState(GameState.SWAP2, prevState);
                 break;
             }
             case GameState.SWAP2:
@@ -283,7 +281,7 @@ public class Card : MonoBehaviour
                 //flipCard();
                 CardHandler.Instance.enemySelectedCard = this;
                 CardHandler.Instance.cardPlayed(null);                
-                GameManager.Instance.setGameState(GameState.SPECIAL_PLAY, prevState);
+                GameManager.Instance.Network_setGameState(GameState.SPECIAL_PLAY, prevState);
                 break;
             }
         }
