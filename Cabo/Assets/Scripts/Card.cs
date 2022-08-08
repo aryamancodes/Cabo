@@ -116,7 +116,7 @@ public class Card : MonoBehaviour
             case GameState.START:
             {
                 int index = flipCard(false);
-                CardHandler.Instance.Network_playerCardFlipped(index, true);
+                //CardHandler.Instance.Network_playerCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.playerFlipped;
                 if(CardHandler.Instance.playerFlipped == 0)
@@ -129,7 +129,7 @@ public class Card : MonoBehaviour
             case GameState.ENEMY_READY:
             {
                 int index = flipCard(false);
-                CardHandler.Instance.Network_playerCardFlipped(index, true);
+                //CardHandler.Instance.Network_playerCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.playerFlipped;
                 if(CardHandler.Instance.playerFlipped == 0)
@@ -204,7 +204,7 @@ public class Card : MonoBehaviour
             case GameState.START:
             {
                 int index = flipCard(false);
-                CardHandler.Instance.Network_enemyCardFlipped(index, true);
+                //CardHandler.Instance.Network_enemyCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.enemyFlipped;
                 if(CardHandler.Instance.enemyFlipped == 0)
@@ -217,7 +217,7 @@ public class Card : MonoBehaviour
             case GameState.PLAYER_READY:
             {
                 int index = flipCard(false);
-                CardHandler.Instance.Network_enemyCardFlipped(index, true);
+                //CardHandler.Instance.Network_enemyCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.enemyFlipped;
                 if(CardHandler.Instance.enemyFlipped == 0)

@@ -18,10 +18,10 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
     {
         { GameState.START, new List<string>{"Click on the flipped cards when you're ready!", "Click on the flipped cards when you're ready!"} },
         { GameState.PLAYER_READY, new List<string>{"Waiting for opponent!", "Your opponent is ready. Click on the flipped cards when you're ready!"} },
-        { GameState.PLAYER_DRAW, new List<string>{"It's your turn! You can draw a card or drag a a card from the discard pile in your area. Click the flipped card when you're ready!"
+        { GameState.PLAYER_DRAW, new List<string>{"It's your turn! Draw a card from the draw or discard pile. Click the flipped card when you're ready!"
                                                 , "Waiting for opponent to draw card!"} },
         { GameState.PLAYER_TURN, new List<string>{"Place a card in the middle to play!", "Waiting for opponent to play a card!"} },
-        { GameState.PLAY, new List<string>{"Don't forget to end turn!", "Waiting for opponent to end turn!"} },
+        { GameState.PLAY, new List<string>{"Don't forget to end turn or snap a card!", "Waiting for opponent to end turn. Don't forget you can snap a card now!"} },
         { GameState.SPECIAL_PLAY, new List<string>{"Select a special option or end turn!", "Waiting for opponent to end turn!"} },
         { GameState.PEAK_PLAYER, new List<string>{"Select one of the available cards to peak!", "Waiting for opponent to peak!"} },
         { GameState.PEAK_ENEMY, new List<string>{"Select one of the available cards to peak!", "Waiting for opponent to peak!"} },

@@ -77,8 +77,9 @@ public class DragDrop : MonoBehaviour
                     transform.SetParent(placeCard.transform);
                     Card played = transform.GetComponent<Card>();
                     played.flipCard("up", false);
+                    
                     //FIXME: Correctly detect who snaps the card
-                    if(GameManager.Instance.currState == GameState.PLAYER_DRAW || GameManager.Instance.currState == GameState.ENEMY_DRAW)
+                    if(GameManager.Instance.currState == GameState.PLAY)
                     {
                         GameState whoSnapped = GameState.NONE; 
                         if(startParent.layer == GameManager.Instance.playerLayer){ whoSnapped = GameState.PLAYER_TURN; }

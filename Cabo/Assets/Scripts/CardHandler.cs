@@ -73,20 +73,38 @@ public class CardHandler : MonoBehaviourPunCallbacks
  
         if(currState == GameState.PLAYER_DRAW)
         {
-            setDrawCardsAndArea(true, true);
             flipDownAllCards();
-            setPlayerClickDragAndArea(true, true, true);
-            setEnemyClickDragAndArea(true, true, false);
-            overrideSpecialCard(currState); 
+            overrideSpecialCard(); 
+            if(PhotonNetwork.IsMasterClient)
+            {
+                setDrawCardsAndArea(true, true); 
+                setPlayerClickDragAndArea(true, true, true);
+                setEnemyClickDragAndArea(false, false, false);
+            }
+            else 
+            { 
+                setDrawCardsAndArea(false, false); 
+                setPlayerClickDragAndArea(false, false, false);
+                setEnemyClickDragAndArea(false, false, false);
+            }
         }
 
         if(currState == GameState.ENEMY_DRAW)
         {
-            setDrawCardsAndArea(true, true);
-            flipDownAllCards(); 
-            setPlayerClickDragAndArea(true, true, false);
-            setEnemyClickDragAndArea(true, true, true);
-            overrideSpecialCard(currState); 
+            flipDownAllCards();
+            overrideSpecialCard(); 
+            if(!PhotonNetwork.IsMasterClient)
+            {
+                setDrawCardsAndArea(true, true); 
+                setPlayerClickDragAndArea(false, false, false);
+                setEnemyClickDragAndArea(true, true, true);
+            }
+            else 
+            { 
+                setDrawCardsAndArea(false, false); 
+                setPlayerClickDragAndArea(false, false, false);
+                setEnemyClickDragAndArea(false, false, false);
+            }
         }
 
         if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
@@ -197,9 +215,10 @@ public class CardHandler : MonoBehaviourPunCallbacks
              if(i%2 == 1 && PhotonNetwork.IsMasterClient)
             {
                 playerCard.flipCard("up", false);
+                playerFlipped = 2;     
+
             }
             else { playerCard.button.interactable = false; }
-            playerFlipped = 2;     
 
                 
             Card enemyCard  = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
@@ -213,12 +232,10 @@ public class CardHandler : MonoBehaviourPunCallbacks
             if(i%2 == 0 && !PhotonNetwork.IsMasterClient)
             {
                 enemyCard.flipCard("up", false);
+                enemyFlipped = 2;
+
             }
-            else
-            {
-                enemyCard.button.interactable = false;
-            }
-            enemyFlipped = 2;
+            else { enemyCard.button.interactable = false; }
 
         }
     }
@@ -237,7 +254,6 @@ public class CardHandler : MonoBehaviourPunCallbacks
             playerSelectedCard = drawnCard;
             setPlayerClickDragAndArea(false, false, true);
             setEnemyClickDragAndArea(false, false, false);
-
         }
         else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
         {
@@ -288,27 +304,22 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
     // If a card is drawn and not played immediately, it is no longer special.
     // This function disables the speciality of such cards.
-    public void overrideSpecialCard(GameState curr)
+    public void overrideSpecialCard()
     {
-        if(curr == GameState.PLAYER_DRAW)
-        {
-            foreach(Transform child in enemyArea.transform)
-            {
-                if(child.childCount != 0)
-                {
-                    child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
-                }
-            }
 
-        }
-        if(curr == GameState.ENEMY_DRAW)
+        foreach(Transform child in playerArea.transform)
         {
-            foreach(Transform child in playerArea.transform)
+            if(child.childCount != 0)
             {
-                if(child.childCount != 0)
-                {
-                    child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
-                }
+                child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
+            }
+        }
+
+        foreach(Transform child in enemyArea.transform)
+        {
+            if(child.childCount != 0)
+            {
+                child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
             }
         }
 
