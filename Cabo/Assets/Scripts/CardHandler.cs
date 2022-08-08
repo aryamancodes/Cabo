@@ -212,15 +212,18 @@ public class CardHandler : MonoBehaviourPunCallbacks
             playerCard.transform.SetParent(playerSlot.transform, false);
             playerCard.gameObject.layer = playerArea.layer;
             playerSlot.gameObject.layer = playerArea.layer;
-             if(i%2 == 1 && PhotonNetwork.IsMasterClient)
+            playerCard.button.interactable = false;
+             if(i%2 == 1)
             {
-                playerCard.flipCard("up", false);
-                playerFlipped = 2;     
-
+                if(PhotonNetwork.IsMasterClient)
+                {
+                    playerCard.flipCard("up", false);
+                    playerFlipped = 2;     
+                    playerCard.button.interactable = true;
+                }
+                else { playerCard.flipCard("up", true); }
             }
-            else { playerCard.button.interactable = false; }
 
-                
             Card enemyCard  = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
             GameObject enemySlot = Instantiate(enemyCard.slot, new Vector2(0,0), Quaternion.identity);
             enemyCard.card = DeckGenerator.Instance.getCard();
@@ -229,14 +232,17 @@ public class CardHandler : MonoBehaviourPunCallbacks
             enemyCard.transform.SetParent(enemySlot.transform, false);
             enemyCard.gameObject.layer = enemyArea.layer;
             enemySlot.gameObject.layer = enemyArea.layer;
-            if(i%2 == 0 && !PhotonNetwork.IsMasterClient)
+            enemyCard.button.interactable = false;
+            if(i%2 == 0)
             {
-                enemyCard.flipCard("up", false);
-                enemyFlipped = 2;
-
+                if(!PhotonNetwork.IsMasterClient)
+                {
+                    enemyCard.flipCard("up", false);
+                    enemyFlipped = 2;
+                    enemyCard.button.interactable = true;
+                }
+               else { enemyCard.flipCard("up", true); } 
             }
-            else { enemyCard.button.interactable = false; }
-
         }
     }
    

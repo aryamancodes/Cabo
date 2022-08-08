@@ -63,9 +63,10 @@ public class Card : MonoBehaviour
     {        
         if(faceUp) { image.sprite = back; }
 
-        if(!faceUp && hidden) { image.sprite = face_hidden; }
+        // Modify the base card face directly, otherwise changes don't sync
+        if(!faceUp && hidden) { card.face = face_hidden; }
 
-        if(!faceUp && !hidden) { image.sprite = face; }
+        if(!faceUp && !hidden) {  image.sprite = face; }
 
         faceUp = !faceUp;
         return getIndex();
@@ -81,16 +82,20 @@ public class Card : MonoBehaviour
             faceUp = false;
 
         }
+
+        // Modify the base card face directly, otherwise changes don't sync
         else if(direction == "up" && hidden)
         {
-            image.sprite = face_hidden;
+            card.face = face_hidden;
             faceUp = true;
         }
+        
         else if(direction == "up")
         {
             image.sprite = face;
             faceUp = true;
         }
+
         return getIndex();
     }
 
@@ -116,7 +121,7 @@ public class Card : MonoBehaviour
             case GameState.START:
             {
                 int index = flipCard(false);
-                //CardHandler.Instance.Network_playerCardFlipped(index, true);
+                CardHandler.Instance.Network_playerCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.playerFlipped;
                 if(CardHandler.Instance.playerFlipped == 0)
@@ -129,7 +134,7 @@ public class Card : MonoBehaviour
             case GameState.ENEMY_READY:
             {
                 int index = flipCard(false);
-                //CardHandler.Instance.Network_playerCardFlipped(index, true);
+                CardHandler.Instance.Network_playerCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.playerFlipped;
                 if(CardHandler.Instance.playerFlipped == 0)
