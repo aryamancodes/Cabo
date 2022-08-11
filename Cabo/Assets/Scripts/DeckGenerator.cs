@@ -12,6 +12,8 @@ using Photon.Realtime;
 public class DeckGenerator: MonoBehaviourPunCallbacks
 {
     public static DeckGenerator Instance;
+
+    public Sprite hidden;
     
     public List<Sprite> heartCards = new List<Sprite>();
     public List<Sprite> diamondCards = new List<Sprite>();
@@ -40,8 +42,8 @@ public class DeckGenerator: MonoBehaviourPunCallbacks
             
             if(suit == CardBase.Suit.Joker)
             {
-                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][0], -2, CardBase.Suit.Joker, false));
-                deck.Add(CardBase.CreateInstance(dict[CardBase.Suit.Joker][1], -2, CardBase.Suit.Joker, false));
+                deck.Add(CardBase.CreateInstance(hidden, dict[CardBase.Suit.Joker][0], -2, CardBase.Suit.Joker, false));
+                deck.Add(CardBase.CreateInstance(hidden, dict[CardBase.Suit.Joker][1], -2, CardBase.Suit.Joker, false));
                 continue;
             }
 
@@ -52,11 +54,11 @@ public class DeckGenerator: MonoBehaviourPunCallbacks
                 //red kings have a special value but aren't special card when played
                 if(i == 12 && (suit == CardBase.Suit.Heart || suit == CardBase.Suit.Diamond))
                 {
-                    deck.Add(CardBase.CreateInstance(dict[suit][i], -1, suit, false));
+                    deck.Add(CardBase.CreateInstance(hidden, dict[suit][i], -1, suit, false));
                     continue;
                 }
 
-                deck.Add(CardBase.CreateInstance(dict[suit][i], i+1, suit, special));
+                deck.Add(CardBase.CreateInstance(hidden, dict[suit][i], i+1, suit, special));
             }
         }
         Shuffle(deck, seed);

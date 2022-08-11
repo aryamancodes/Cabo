@@ -197,15 +197,15 @@ public class CardHandler : MonoBehaviourPunCallbacks
             playerCard.gameObject.layer = playerArea.layer;
             playerSlot.gameObject.layer = playerArea.layer;
             playerCard.button.interactable = false;
-             if(i%2 == 1)
+            if(i%2 == 1)
             {
                 if(PhotonNetwork.IsMasterClient)
                 {
                     playerCard.flipCard("up", false);
-                    playerFlipped = 2;     
+                    playerFlipped = 2;
                     playerCard.button.interactable = true;
                 }
-                else { playerCard.flipCard("up", true); }
+               else { playerCard.flipCard("up", true); } 
             }
 
             Card enemyCard  = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
@@ -444,5 +444,23 @@ public class CardHandler : MonoBehaviourPunCallbacks
             }
         }
         GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, who);
+    }
+
+    public void Network_playCard(int index, int startParentLayer)
+    {
+        view.RPC(nameof(RPC_playCard), RpcTarget.Others, index, startParentLayer);
+        Debug.Log("play card at index" + index + " and start parent " + startParentLayer);
+    }
+    public void RPC_playCard(int index, int startParentLayer)
+    {
+        GameObject parent;
+        if(startParentLayer == GameManager.Instance.playerLayer) { parent = playerArea; }
+        else { parent = enemyArea; }
+        Card played = parent.transform.GetChild(index).GetChild(0).GetComponent<Card>();
+        played.transform.position = placeArea.transform.position;
+        played.transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
+        played.transform.gameObject.layer = placeArea.layer;
+        played.transform.SetParent(placeArea.transform);
+        played.flipCard("up", false);
     }
 }

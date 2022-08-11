@@ -17,10 +17,7 @@ public class Card : MonoBehaviour
     public GameObject slot;    
     public bool faceUp = false;
 
-    public Button button;
-    public Sprite face;
-    public Sprite face_hidden;
-    
+    public Button button;    
     public CardBase.Suit suit;
     public int value;
     public bool isSpecialCard;
@@ -30,14 +27,13 @@ public class Card : MonoBehaviour
     {
         if(card != null)
         {
-            face = card.face;
             suit = card.suit;
             value = card.value;
             isSpecialCard = card.isSpecialCard;
         } 
         if(faceUp)
         {
-            image.sprite = face;
+            image.sprite = card.shownFace;
         }
         else
         {
@@ -61,12 +57,24 @@ public class Card : MonoBehaviour
     // Returns the index of the card flipped.
     public int flipCard(bool hidden)
     {        
-        if(faceUp) { image.sprite = back; }
+        if(faceUp)
+        {
+            image.sprite = back; 
+            card.shownFace = back;
+        }
 
         // Modify the base card face directly, otherwise changes don't sync
-        if(!faceUp && hidden) { card.face = face_hidden; }
+        if(!faceUp && hidden) 
+        { 
+            image.sprite = card.hiddenFace; 
+            card.shownFace = card.hiddenFace;
+        }
 
-        if(!faceUp && !hidden) {  image.sprite = face; }
+        if(!faceUp && !hidden) 
+        {  
+            image.sprite = card.cardFace; 
+            card.shownFace = card.cardFace;
+        }
 
         faceUp = !faceUp;
         return getIndex();
@@ -79,20 +87,22 @@ public class Card : MonoBehaviour
         if(direction == "down")
         {
             image.sprite = back;
+            card.shownFace = back;
             faceUp = false;
-
         }
 
         // Modify the base card face directly, otherwise changes don't sync
         else if(direction == "up" && hidden)
         {
-            card.face = face_hidden;
+            image.sprite = card.hiddenFace;
+            card.shownFace = card.hiddenFace;
             faceUp = true;
         }
         
         else if(direction == "up")
         {
-            image.sprite = face;
+            image.sprite = card.cardFace;
+            card.shownFace = card.cardFace;
             faceUp = true;
         }
 
@@ -123,7 +133,7 @@ public class Card : MonoBehaviour
                 int index = flipCard(false);
                 CardHandler.Instance.Network_playerCardFlipped(index, true);
                 button.interactable = false;
-                --CardHandler.Instance.playerFlipped;
+               --CardHandler.Instance.playerFlipped;
                 if(CardHandler.Instance.playerFlipped == 0)
                 {
                     GameManager.Instance.Network_setGameState(GameState.PLAYER_READY);
@@ -207,7 +217,7 @@ public class Card : MonoBehaviour
             case GameState.START:
             {
                 int index = flipCard(false);
-                //CardHandler.Instance.Network_enemyCardFlipped(index, true);
+                CardHandler.Instance.Network_enemyCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.enemyFlipped;
                 if(CardHandler.Instance.enemyFlipped == 0)
@@ -220,7 +230,7 @@ public class Card : MonoBehaviour
             case GameState.PLAYER_READY:
             {
                 int index = flipCard(false);
-                //CardHandler.Instance.Network_enemyCardFlipped(index, true);
+                CardHandler.Instance.Network_enemyCardFlipped(index, true);
                 button.interactable = false;
                 --CardHandler.Instance.enemyFlipped;
                 if(CardHandler.Instance.enemyFlipped == 0)

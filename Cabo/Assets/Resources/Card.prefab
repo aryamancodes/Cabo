@@ -17,7 +17,6 @@ GameObject:
   - component: {fileID: 8027673762274384217}
   - component: {fileID: -7763341921091130729}
   - component: {fileID: -7523415434540078743}
-  - component: {fileID: 1241931177397881618}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -101,13 +100,10 @@ MonoBehaviour:
   slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
   faceUp: 0
   button: {fileID: 7049321018006798974}
-  face: {fileID: 21300000, guid: 28c93171198ff47daad33a6491f28891, type: 3}
-  face_hidden: {fileID: 21300000, guid: 9f8986b20ad7b4c75889c975bea90f26, type: 3}
   suit: 3
   value: 3
   isSpecialCard: 0
   canDrag: 0
-  isHidden: 1
 --- !u!114 &7049321018006798974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,7 +172,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e97dbe23fd1d04235a3a9018828312ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
+  canvas: {fileID: 0}
+  placeArea: {fileID: 3912489750167773895, guid: a4d0a3cb8cb1b4bebb722642fb70b8b7, type: 3}
   startParent: {fileID: 0}
+  isDragging: 0
+  dropZone: {fileID: 0}
+  UILayer: 0
+  index: 0
 --- !u!114 &8027673762274384217
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238,6 +241,18 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+        - m_Target: {fileID: 2559061474170667454}
+          m_TargetAssemblyTypeName: DragDrop, Assembly-CSharp
+          m_MethodName: setIndex
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!50 &-7763341921091130729
 Rigidbody2D:
   serializedVersion: 4
@@ -285,25 +300,3 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 70, y: 90}
   m_EdgeRadius: 0
---- !u!114 &1241931177397881618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5810423015560917801}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 1
-  ObservedComponents: []
-  sceneViewId: 0
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
