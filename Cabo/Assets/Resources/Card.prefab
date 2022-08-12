@@ -172,13 +172,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e97dbe23fd1d04235a3a9018828312ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  slot: {fileID: 6753733537024699217, guid: 5775e351bd0dd441bbe99c2d60f98455, type: 3}
+  card: {fileID: 7746321002957887508}
   canvas: {fileID: 0}
-  placeArea: {fileID: 3912489750167773895, guid: a4d0a3cb8cb1b4bebb722642fb70b8b7, type: 3}
+  placeArea: {fileID: 100008, guid: 45e438e80c2860545b63beb8d6718edd, type: 3}
   startParent: {fileID: 0}
   isDragging: 0
   dropZone: {fileID: 0}
-  UILayer: 0
   index: 0
 --- !u!114 &8027673762274384217
 MonoBehaviour:

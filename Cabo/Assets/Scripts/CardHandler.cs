@@ -102,8 +102,9 @@ public class CardHandler : MonoBehaviourPunCallbacks
         {
             flipDownAllCards();
             setDrawCardsAndArea(false, true);
-            setPlayerClickDragAndArea(true, true, false);
             setEnemyClickDragAndArea(false, false, false);
+            if(PhotonNetwork.IsMasterClient) { setPlayerClickDragAndArea(true, true, false); } 
+            else { setPlayerClickDragAndArea(false, false, false); } 
         }
 
         if(currState == GameState.ENEMY_TURN)
@@ -449,8 +450,9 @@ public class CardHandler : MonoBehaviourPunCallbacks
     public void Network_playCard(int index, int startParentLayer)
     {
         view.RPC(nameof(RPC_playCard), RpcTarget.Others, index, startParentLayer);
-        Debug.Log("play card at index" + index + " and start parent " + startParentLayer);
     }
+
+    [PunRPC]
     public void RPC_playCard(int index, int startParentLayer)
     {
         GameObject parent;

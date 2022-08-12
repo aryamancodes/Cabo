@@ -5,24 +5,23 @@ using UnityEngine.UI;
 
 public class DragDrop : MonoBehaviour
 {        
-    private Card card;
-    private GameObject canvas;
-    private GameObject placeCard;
-    private GameObject slot;
+    public Card card;
+    public GameObject canvas;
+    public GameObject placeArea;
     public GameObject startParent = null;
-    private bool isDragging = false; 
-    private GameObject dropZone = null;
-    private int UILayer;
+    public bool isDragging = false; 
+    public GameObject dropZone = null;
+    public int index;
 
 
     void Start()
-    {
-        card = GetComponent<Card>();
+    {        
         canvas = GameObject.Find("Canvas");
-        placeCard = GameObject.Find("Place Card");
-        slot = GameObject.Find("Slot");
+        placeArea = GameObject.Find("Place Card");
+
     }
-     // Update is called once per frame
+    
+    // Update is called once per frame
     void Update()
     {
         if(isDragging && card.canDrag)
@@ -45,9 +44,16 @@ public class DragDrop : MonoBehaviour
         dropZone = null;
     }
 
+    //called by Begin Drag event trigger
     public void setStartParent()
     {
         startParent = transform.parent.gameObject;
+    }
+
+    //called by Begin Drag event trigger
+    public void setIndex()
+    {
+        index = card.getIndex();
     }
     public void startDrag()
     {
@@ -71,27 +77,28 @@ public class DragDrop : MonoBehaviour
                 }
                 if(dropZone.layer == GameManager.Instance.UILayer && startParent.layer != GameManager.Instance.UILayer) //drop card into center
                 {
-                    transform.position = placeCard.transform.position;
+                    transform.position = placeArea.transform.position;
                     transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
-                    transform.gameObject.layer = dropZone.layer;
-                    transform.SetParent(placeCard.transform);
-                    Card played = transform.GetComponent<Card>();
-                    played.flipCard("up", false);
+                    gameObject.layer = placeArea.layer;
+                    transform.SetParent(placeArea.transform);
+                    card.flipCard("up", false);
+                    CardHandler.Instance.Network_playCard(index, startParent.layer);
                     
                     //FIXME: Correctly detect who snaps the card
-                    if(GameManager.Instance.currState == GameState.PLAY)
-                    {
-                        GameState whoSnapped = GameState.NONE; 
-                        if(startParent.layer == GameManager.Instance.playerLayer){ whoSnapped = GameState.PLAYER_TURN; }
-                        else if(startParent.layer == GameManager.Instance.enemyLayer) { whoSnapped = GameState.ENEMY_TURN; }
-                        CardHandler.Instance.checkSnapped(whoSnapped); 
-                    }
-                    else { CardHandler.Instance.cardPlayed(played); }
+                    // if(GameManager.Instance.currState == GameState.PLAY)
+                    // {
+                    //     GameState whoSnapped = GameState.NONE; 
+                    //     if(startParent.layer == GameManager.Instance.playerLayer){ whoSnapped = GameState.PLAYER_TURN; }
+                    //     else if(startParent.layer == GameManager.Instance.enemyLayer) { whoSnapped = GameState.ENEMY_TURN; }
+                    //     CardHandler.Instance.checkSnapped(whoSnapped); 
+                    // }
+                    // else { 
+                    CardHandler.Instance.cardPlayed(card); 
                 }
 
                 else if(startParent.layer == GameManager.Instance.UILayer)
                 {
-                    drawFromPlaceCard();
+                    drawFromPlaceArea();
                 }
 
                 else
@@ -117,7 +124,7 @@ public class DragDrop : MonoBehaviour
         transform.rotation = Quaternion.identity;
     }
 
-    void drawFromPlaceCard()
+    void drawFromPlaceArea()
     {
         insertIntoArea();
         CardHandler.Instance.setDrawCardsAndArea(false, false);
@@ -151,7 +158,7 @@ public class DragDrop : MonoBehaviour
             }
         }
         //insert as a new card 
-        GameObject newSlot = Instantiate(slot, new Vector2(0,0), Quaternion.identity);
+        GameObject newSlot = Instantiate(card.slot, new Vector2(0,0), Quaternion.identity);
         newSlot.transform.SetParent(dropZone.transform, false);
         newSlot.gameObject.layer = dropZone.layer;
         transform.SetParent(newSlot.transform, false);
