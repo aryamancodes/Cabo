@@ -43,18 +43,35 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         GameManager.gameStateChanged -= OnGameStateChanged;
     }
 
-    public PlayOption showOption(string name)
+    public PlayOption showOption(string name, bool toLastPlayerOnly=false)
     {
         PlayOption ret = null;
+        GameState prevState = GameManager.Instance.prevState;
+        
         foreach(PlayOption option in options)
         {
             if (option.optionName == name)
             {
-                option.open();
                 ret = option;
+                break;
             }
         }
-        return ret;
+        if(toLastPlayerOnly && prevState == GameState.PLAYER_TURN && PhotonNetwork.IsMasterClient) 
+        { 
+            ret.open();
+            return ret; 
+        }
+        else if(toLastPlayerOnly && prevState == GameState.ENEMY_TURN && !PhotonNetwork.IsMasterClient)
+        { 
+            ret.open();
+            return ret; 
+        }
+        else if(!toLastPlayerOnly)
+        { 
+            ret.open();
+            return ret; 
+        }
+        return null;
     }
     public void hideAllOptions ()
     {
@@ -143,7 +160,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
                 setHint(player_hint, dict[currState][1]);
                 setHint(enemy_hint, dict[currState][0]);
             }
-            showOption("end_turn");
+            showOption("end_turn", true);
         }
 
         if(currState == GameState.SPECIAL_PLAY)
@@ -152,7 +169,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
             if(lastPlayed == null)
             {
-                showOption("swap");
+                showOption("swap", true);
                 return;
             }
 
@@ -160,19 +177,19 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
             if(value == 7 || value == 8)
             {
-                showOption("peak_player");
+                showOption("peak_player", true);
             }
             if(value == 9 || value == 10)
             {
-                showOption("peak_enemy");
+                showOption("peak_enemy", true);
             }
             if(value == 11 || value == 12)
             {
-                showOption("blind_swap");
+                showOption("blind_swap", true);
             }
             if(value == 13)
             {
-                showOption("peak_and_swap");
+                showOption("peak_and_swap", true);
             }
         }
 

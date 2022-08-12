@@ -74,7 +74,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(currState == GameState.PLAYER_DRAW)
         {
             flipDownAllCards();
-            overrideSpecialCard(); 
+            overrideSpecialCards(); 
             setEnemyClickDragAndArea(false, false, false);
             setPlayerClickDragAndArea(false, false, true);
             if(PhotonNetwork.IsMasterClient) { setDrawCardsAndArea(true, true); }
@@ -84,7 +84,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(currState == GameState.ENEMY_DRAW)
         {
             flipDownAllCards();
-            overrideSpecialCard(); 
+            overrideSpecialCards(); 
             setPlayerClickDragAndArea(false, false, false);
             setEnemyClickDragAndArea(false, false, true);
             if(!PhotonNetwork.IsMasterClient) { setDrawCardsAndArea(true, true); }
@@ -287,10 +287,10 @@ public class CardHandler : MonoBehaviourPunCallbacks
         else 
         { 
             card = enemyCard.transform;
-            if(!PhotonNetwork.IsMasterClient) { enemyCard.flipCard(true); }
+            if(!PhotonNetwork.IsMasterClient) { enemyCard.flipCard(false); }
             else 
             {
-                enemyCard.flipCard(false); 
+                enemyCard.flipCard(true); 
                 enemyCard.button.interactable = false;
             }
         }
@@ -316,14 +316,14 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
     // If a card is drawn and not played immediately, it is no longer special.
     // This function disables the speciality of such cards.
-    public void overrideSpecialCard()
+    public void overrideSpecialCards()
     {
 
         foreach(Transform child in playerArea.transform)
         {
             if(child.childCount != 0)
             {
-                child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
+                child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
             }
         }
 
@@ -331,13 +331,13 @@ public class CardHandler : MonoBehaviourPunCallbacks
         {
             if(child.childCount != 0)
             {
-                child.GetChild(0).GetComponent<Card>().card.isSpecialCard = false;
+                child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
             }
         }
 
         foreach(Transform child in placeArea.transform)
         {
-            child.GetComponent<Card>().card.isSpecialCard = false;
+            child.GetComponent<Card>().isSpecialCard = false;
         }
     }
 
