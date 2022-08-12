@@ -94,6 +94,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
         {
             setDrawCardsAndArea(false, false);
+            played.button.interactable = true;
             setPlayerClickDragAndArea(true, true, false);
             setEnemyClickDragAndArea(true, true, false);
         }
@@ -447,6 +448,8 @@ public class CardHandler : MonoBehaviourPunCallbacks
         GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, who);
     }
 
+
+    //Wrappers and RPCs for moving card around, called by DragDrop
     public void Network_playCard(int index, int startParentLayer)
     {
         view.RPC(nameof(RPC_playCard), RpcTarget.Others, index, startParentLayer);
@@ -464,5 +467,6 @@ public class CardHandler : MonoBehaviourPunCallbacks
         played.transform.gameObject.layer = placeArea.layer;
         played.transform.SetParent(placeArea.transform);
         played.flipCard("up", false);
+        cardPlayed(played);
     }
 }
