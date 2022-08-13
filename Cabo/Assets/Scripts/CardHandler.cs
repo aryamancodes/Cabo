@@ -91,12 +91,21 @@ public class CardHandler : MonoBehaviourPunCallbacks
             else { setDrawCardsAndArea(false, false); }
         }
 
-        if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
+        if(currState == GameState.PLAY)
         {
             setDrawCardsAndArea(false, false);
             played.button.interactable = true;
             setPlayerClickDragAndArea(true, true, false);
             setEnemyClickDragAndArea(true, true, false);
+        }
+
+        if(currState == GameState.SPECIAL_PLAY)
+        {
+            setDrawCardsAndArea(false, false);
+            played.button.interactable = true;
+            setPlayerClickDragAndArea(false, false, false);
+            setEnemyClickDragAndArea(false, false, false);
+
         }
 
         if(currState == GameState.PLAYER_TURN)
@@ -112,21 +121,24 @@ public class CardHandler : MonoBehaviourPunCallbacks
         {
             flipDownAllCards();
             setDrawCardsAndArea(false, true);
-            setPlayerClickDragAndArea(false, true, false);
-            setEnemyClickDragAndArea(true, true, false);
+            setPlayerClickDragAndArea(false, false, false);
+            if(!PhotonNetwork.IsMasterClient) { setEnemyClickDragAndArea(true, true, false); } 
+            else { setEnemyClickDragAndArea(false, false, false); } 
         }
 
         if(currState == GameState.SWAP1 || currState == GameState.BLIND_SWAP1 || currState == GameState.PEAK_PLAYER)
         {
             if(prevState == GameState.PLAYER_TURN)
             {
-                setPlayerClickDragAndArea(true, false, false);
+                if(PhotonNetwork.IsMasterClient) { setPlayerClickDragAndArea(true, false, false); }
+                else { setPlayerClickDragAndArea(false, false, false); }
                 setEnemyClickDragAndArea(false, false, false);
             }
             else if(prevState == GameState.ENEMY_TURN)
             {
+                if(!PhotonNetwork.IsMasterClient) { setEnemyClickDragAndArea(true, false, false); }
+                else { setEnemyClickDragAndArea(false, false, false); }
                 setPlayerClickDragAndArea(false, false, false);
-                setEnemyClickDragAndArea(true, false, false);
             }
         }
 
@@ -134,12 +146,14 @@ public class CardHandler : MonoBehaviourPunCallbacks
         {
             if(prevState == GameState.PLAYER_TURN)
             {
+                if(PhotonNetwork.IsMasterClient) { setEnemyClickDragAndArea(true, false, false); }
+                else { setEnemyClickDragAndArea(false, false, false); }
                 setPlayerClickDragAndArea(false, false, false);
-                setEnemyClickDragAndArea(true, false, false);
             }
             else if(prevState == GameState.ENEMY_TURN)
             {
-                setPlayerClickDragAndArea(true, false, false);
+                if(!PhotonNetwork.IsMasterClient) { setPlayerClickDragAndArea(true, false, false); }
+                else { setPlayerClickDragAndArea(false, false, false); }
                 setEnemyClickDragAndArea(false, false, false);
             }
         }
@@ -159,32 +173,6 @@ public class CardHandler : MonoBehaviourPunCallbacks
             }
         }
     }
-
-    // Static wrappers and RPCs for flipping a card
-    public void Network_playerCardFlipped(int index, bool hidden, string direction="")
-    {
-        view.RPC(nameof(RPC_playerCardFlipped), RpcTarget.Others, index, hidden, direction);
-    }
-    public void Network_enemyCardFlipped(int index, bool hidden, string direction="")
-    {
-        view.RPC(nameof(RPC_enemyCardFlipped), RpcTarget.Others, index, hidden, direction);
-    }
-    
-    [PunRPC]
-    public void RPC_playerCardFlipped(int index, bool hidden, string direction)
-    {
-        //if(PhotonNetwork.IsMasterClient){ return; }
-        if(direction != "") { playerArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(direction, hidden); }
-        else { playerArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(hidden); }   
-    }
-
-    [PunRPC]
-    public void RPC_enemyCardFlipped(int index, bool hidden, string direction)
-    {
-        if (direction != "") { enemyArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(direction, hidden); }
-        else { enemyArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(hidden); }
-    }
-
 
      public void firstDistribute()
     {
@@ -320,26 +308,26 @@ public class CardHandler : MonoBehaviourPunCallbacks
     public void overrideSpecialCards()
     {
 
-        foreach(Transform child in playerArea.transform)
-        {
-            if(child.childCount != 0)
-            {
-                child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
-            }
-        }
+        // foreach(Transform child in playerArea.transform)
+        // {
+        //     if(child.childCount != 0)
+        //     {
+        //         child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
+        //     }
+        // }
 
-        foreach(Transform child in enemyArea.transform)
-        {
-            if(child.childCount != 0)
-            {
-                child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
-            }
-        }
+        // foreach(Transform child in enemyArea.transform)
+        // {
+        //     if(child.childCount != 0)
+        //     {
+        //         child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
+        //     }
+        // }
 
-        foreach(Transform child in placeArea.transform)
-        {
-            child.GetComponent<Card>().isSpecialCard = false;
-        }
+        // foreach(Transform child in placeArea.transform)
+        // {
+        //     child.GetComponent<Card>().isSpecialCard = false;
+        // }
     }
 
     public void flipDownAllCards()
@@ -421,7 +409,13 @@ public class CardHandler : MonoBehaviourPunCallbacks
         }
     }
 
-    public void swapCards()
+    public void Network_swapCards()
+    {
+        view.RPC(nameof(RPC_swapCards), RpcTarget.All, null);
+    }
+
+    [PunRPC]
+    public void RPC_swapCards()
     {
         var playerParent = playerSelectedCard.transform.parent;
         var enemyparent = enemySelectedCard.transform.parent;
@@ -449,6 +443,57 @@ public class CardHandler : MonoBehaviourPunCallbacks
     }
 
 
+    // Static wrappers and RPCs called by Card
+    public void Network_playerCardFlipped(int index, bool hidden, string direction="")
+    {
+        view.RPC(nameof(RPC_playerCardFlipped), RpcTarget.Others, index, hidden, direction);
+    }
+
+    [PunRPC]
+    public void RPC_playerCardFlipped(int index, bool hidden, string direction)
+    {
+        //if(PhotonNetwork.IsMasterClient){ return; }
+        if(direction != "") { playerArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(direction, hidden); }
+        else { playerArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(hidden); }   
+    }
+    public void Network_enemyCardFlipped(int index, bool hidden, string direction="")
+    {
+        view.RPC(nameof(RPC_enemyCardFlipped), RpcTarget.Others, index, hidden, direction);
+    }
+
+    [PunRPC]
+    public void RPC_enemyCardFlipped(int index, bool hidden, string direction)
+    {
+        if (direction != "") { enemyArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(direction, hidden); }
+        else { enemyArea.transform.GetChild(index).GetChild(0).GetComponent<Card>().flipCard(hidden); }
+    }
+
+    public void Network_setPlayerSelectedCard(Card card)
+    {
+        playerSelectedCard = card;
+        view.RPC(nameof(RPC_setPlayerSelectedCard), RpcTarget.Others, card.getIndex());
+    }
+
+    [PunRPC]
+    public void RPC_setPlayerSelectedCard(int index)
+    {
+        playerSelectedCard = playerArea.transform.GetChild(index).GetChild(0).GetComponent<Card>();
+        playerSelectedCard.button.interactable = true;
+    }
+    public void Network_setEnemySelectedCard(Card card)
+    {
+        enemySelectedCard = card;
+        view.RPC(nameof(RPC_setEnemySelectedCard), RpcTarget.Others, card.getIndex());
+    }
+
+    [PunRPC]
+    public void RPC_setEnemySelectedCard(int index)
+    {
+        enemySelectedCard = enemyArea.transform.GetChild(index).GetChild(0).GetComponent<Card>();
+        enemySelectedCard.button.interactable = true;
+    }
+
+
     //Wrappers and RPCs for moving card around, called by DragDrop
     public void Network_playCard(int index, int startParentLayer)
     {
@@ -461,12 +506,11 @@ public class CardHandler : MonoBehaviourPunCallbacks
         GameObject parent;
         if(startParentLayer == GameManager.Instance.playerLayer) { parent = playerArea; }
         else { parent = enemyArea; }
-        Card played = parent.transform.GetChild(index).GetChild(0).GetComponent<Card>();
+        played = parent.transform.GetChild(index).GetChild(0).GetComponent<Card>();
         played.transform.position = placeArea.transform.position;
         played.transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
         played.transform.gameObject.layer = placeArea.layer;
         played.transform.SetParent(placeArea.transform);
         played.flipCard("up", false);
-        cardPlayed(played);
     }
 }

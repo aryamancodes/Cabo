@@ -57,7 +57,7 @@ public class PlayOption : MonoBehaviour
         }
         if(optionName == "swap")
         {
-            CardHandler.Instance.swapCards();
+            CardHandler.Instance.Network_swapCards();
             GameManager.Instance.Network_setGameState(GameState.PLAY, prev);
         }
         if(optionName == "peak_player")
