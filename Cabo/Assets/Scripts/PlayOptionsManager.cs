@@ -12,7 +12,6 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 {
     public List<PlayOption> options;
 
-
     //dictionary of hints of the form currState -> {active player hint, waiting player hint}
     Dictionary<GameState, List<string>> dict = new Dictionary<GameState, List<string>>()
     {
@@ -73,7 +72,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         }
         return null;
     }
-    public void hideAllOptions ()
+    public void hideAllOptions()
     {
         foreach(PlayOption option in options)
         {
@@ -193,9 +192,9 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
             }
         }
 
-        if(currState == GameState.PEAK_PLAYER || currState == GameState.PEAK_ENEMY || currState == GameState.SWAP1 || currState == GameState.SWAP2
-        || currState == GameState.BLIND_SWAP1 || currState == GameState.BLIND_SWAP2)
+        if(currState == GameState.PEAK_PLAYER)
         {
+            showOption("peak_player", false);
             if(prevState == GameState.PLAYER_TURN)
             {
                 setHint(player_hint, dict[currState][0]);
@@ -208,5 +207,50 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
             }
         }
 
+        if(currState == GameState.PEAK_ENEMY)
+        {
+            showOption("peak_enemy", false);
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setHint(player_hint, dict[currState][0]);
+                setHint(enemy_hint, dict[currState][1]);
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                setHint(player_hint, dict[currState][1]);
+                setHint(enemy_hint, dict[currState][0]);
+            }
+        }
+
+        if(currState == GameState.SWAP1 || currState == GameState.SWAP2)
+        {
+            showOption("peak_and_swap", false);
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setHint(player_hint, dict[currState][0]);
+                setHint(enemy_hint, dict[currState][1]);
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                setHint(player_hint, dict[currState][1]);
+                setHint(enemy_hint, dict[currState][0]);
+            }
+        }
+
+        if(currState == GameState.BLIND_SWAP1 || currState == GameState.BLIND_SWAP2)
+        {
+            showOption("blind_swap", false);
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setHint(player_hint, dict[currState][0]);
+                setHint(enemy_hint, dict[currState][1]);
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                setHint(player_hint, dict[currState][1]);
+                setHint(enemy_hint, dict[currState][0]);
+            }
+            
+        }
     }
 }

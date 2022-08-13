@@ -46,6 +46,7 @@ public class PlayOption : MonoBehaviour
                 GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
             }
         }
+
         if(optionName == "blind_swap")
         {
             GameManager.Instance.Network_setGameState(GameState.BLIND_SWAP1, prev);

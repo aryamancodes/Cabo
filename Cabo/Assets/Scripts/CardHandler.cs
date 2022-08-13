@@ -73,6 +73,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
  
         if(currState == GameState.PLAYER_DRAW)
         {
+            correctCardBacks();
             flipDownAllCards();
             overrideSpecialCards(); 
             setEnemyClickDragAndArea(false, false, false);
@@ -83,6 +84,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
         if(currState == GameState.ENEMY_DRAW)
         {
+            correctCardBacks();
             flipDownAllCards();
             overrideSpecialCards(); 
             setPlayerClickDragAndArea(false, false, false);
@@ -94,7 +96,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(currState == GameState.PLAY)
         {
             setDrawCardsAndArea(false, false);
-            played.button.interactable = true;
+            if(played != null) { played.button.interactable = true; }
             setPlayerClickDragAndArea(true, true, false);
             setEnemyClickDragAndArea(true, true, false);
         }
@@ -102,7 +104,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(currState == GameState.SPECIAL_PLAY)
         {
             setDrawCardsAndArea(false, false);
-            played.button.interactable = true;
+            if(played != null) { played.button.interactable = true; }
             setPlayerClickDragAndArea(false, false, false);
             setEnemyClickDragAndArea(false, false, false);
 
@@ -307,27 +309,26 @@ public class CardHandler : MonoBehaviourPunCallbacks
     // This function disables the speciality of such cards.
     public void overrideSpecialCards()
     {
+        foreach(Transform child in playerArea.transform)
+        {
+            if(child.childCount != 0)
+            {
+                child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
+            }
+        }
 
-        // foreach(Transform child in playerArea.transform)
-        // {
-        //     if(child.childCount != 0)
-        //     {
-        //         child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
-        //     }
-        // }
+        foreach(Transform child in enemyArea.transform)
+        {
+            if(child.childCount != 0)
+            {
+                child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
+            }
+        }
 
-        // foreach(Transform child in enemyArea.transform)
-        // {
-        //     if(child.childCount != 0)
-        //     {
-        //         child.GetChild(0).GetComponent<Card>().isSpecialCard = false;
-        //     }
-        // }
-
-        // foreach(Transform child in placeArea.transform)
-        // {
-        //     child.GetComponent<Card>().isSpecialCard = false;
-        // }
+        foreach(Transform child in placeArea.transform)
+        {
+            child.GetComponent<Card>().isSpecialCard = false;
+        }
     }
 
     public void flipDownAllCards()
@@ -347,7 +348,24 @@ public class CardHandler : MonoBehaviourPunCallbacks
             enemySelectedCard.canDrag = false;
             enemySelectedCard = null;
         }
+    }
 
+    public void correctCardBacks()
+    {
+        foreach(Transform child in playerArea.transform)
+        {
+            if(child.childCount != 0)
+            {
+                child.GetChild(0).GetComponent<Card>().back = playerBack;
+            }
+        }
+        foreach(Transform child in enemyArea.transform)
+        {
+            if(child.childCount != 0)
+            {
+                child.GetChild(0).GetComponent<Card>().back = enemyBack;
+            }
+        }
     }
 
     public void setDrawCardsAndArea(bool drawVal, bool areaVal)
@@ -423,6 +441,8 @@ public class CardHandler : MonoBehaviourPunCallbacks
         enemySelectedCard.transform.SetParent(playerParent);
         playerSelectedCard.gameObject.layer = GameManager.Instance.enemyLayer;
         enemySelectedCard.gameObject.layer = GameManager.Instance.playerLayer;
+        playerSelectedCard.flipCard("down", false);
+        enemySelectedCard.flipCard("down", false);
     }
 
     public void checkSnapped(GameState who)
