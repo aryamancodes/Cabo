@@ -220,26 +220,35 @@ public class CardHandler : MonoBehaviourPunCallbacks
                else { enemyCard.flipCard("up", true); } 
             }
         }
-    }
-
-
-    [PunRPC]
-    public void RPC_NetworkOnDrawCard()
-    {
-        Button_LocalOnDrawCard();
-    }
+    }   
 
     public void Button_onDrawCard()
     {
-        Button_LocalOnDrawCard();
-        view.RPC(nameof(RPC_NetworkOnDrawCard), RpcTarget.Others, null);
+        view.RPC(nameof(RPC_OnDrawCard), RpcTarget.All, true);
     }
-   
-    public void Button_LocalOnDrawCard()
+
+    public void Network_drawFromPlaceArea()
     {
-        Card drawnCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
-        GameObject slot = Instantiate(emptyCard.slot, new Vector2(0,0), Quaternion.identity); 
-        drawnCard.card = DeckGenerator.Instance.getCard();
+        view.RPC(nameof(RPC_OnDrawCard), RpcTarget.Others, false);
+    } 
+    
+    [PunRPC]
+    public void RPC_OnDrawCard(bool fromDrawPile)
+    {
+        Card drawnCard = null;
+        GameObject slot = null;
+        if(fromDrawPile)
+        {
+            drawnCard = Instantiate(emptyCard, new Vector2(0,0), Quaternion.identity);
+            drawnCard.card = DeckGenerator.Instance.getCard();
+        }
+        else 
+        { 
+            int length = placeArea.transform.childCount;
+            drawnCard = placeArea.transform.GetChild(length-1).GetComponent<Card>();
+        }
+        slot = Instantiate(emptyCard.slot, new Vector2(0,0), Quaternion.identity); 
+        
         if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
         {
             slot.layer = GameManager.Instance.playerLayer;
@@ -256,8 +265,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
             enemySelectedCard = drawnCard;
             insertDrawnCard(enemyArea, slot, null,drawnCard);
             setPlayerClickDragAndArea(false, false, false);
-            setEnemyClickDragAndArea(false, false, false);
-
+            setEnemyClickDragAndArea(false, false, true);
         }
         setDrawCardsAndArea(false, false);
     }
@@ -268,20 +276,20 @@ public class CardHandler : MonoBehaviourPunCallbacks
         if(playerCard != null) 
         {
             card = playerCard.transform; 
-            if(PhotonNetwork.IsMasterClient) { playerCard.flipCard(false); }
+            if(PhotonNetwork.IsMasterClient) { playerCard.flipCard("up", false); }
             else 
             {
-                playerCard.flipCard(true); 
+                playerCard.flipCard("up", true); 
                 playerCard.button.interactable = false;
             }
         }
         else 
         { 
             card = enemyCard.transform;
-            if(!PhotonNetwork.IsMasterClient) { enemyCard.flipCard(false); }
+            if(!PhotonNetwork.IsMasterClient) { enemyCard.flipCard("up", false); }
             else 
             {
-                enemyCard.flipCard(true); 
+                enemyCard.flipCard("up", true); 
                 enemyCard.button.interactable = false;
             }
         }
@@ -303,6 +311,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         slot.transform.SetParent(area.transform, false);
         card.SetParent(slot.transform, false);
         card.gameObject.layer = area.layer;
+        card.rotation = Quaternion.identity;
     }
 
     // If a card is drawn and not played immediately, it is no longer special.

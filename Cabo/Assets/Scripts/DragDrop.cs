@@ -11,7 +11,7 @@ public class DragDrop : MonoBehaviour
     public GameObject startParent = null;
     public bool isDragging = false; 
     public GameObject dropZone = null;
-    public int index;
+    public int startIndex;
 
 
     void Start()
@@ -53,7 +53,7 @@ public class DragDrop : MonoBehaviour
     //called by Begin Drag event trigger
     public void setIndex()
     {
-        index = card.getIndex();
+        startIndex = card.getIndex();
     }
     public void startDrag()
     {
@@ -82,7 +82,7 @@ public class DragDrop : MonoBehaviour
                     gameObject.layer = placeArea.layer;
                     transform.SetParent(placeArea.transform);
                     card.flipCard("up", false);
-                    CardHandler.Instance.Network_playCard(index, startParent.layer);
+                    CardHandler.Instance.Network_playCard(startIndex, startParent.layer);
                     
                     //FIXME: Correctly detect who snaps the card
                     // if(GameManager.Instance.currState == GameState.PLAY)
@@ -99,6 +99,7 @@ public class DragDrop : MonoBehaviour
                 else if(startParent.layer == GameManager.Instance.UILayer)
                 {
                     drawFromPlaceArea();
+                    CardHandler.Instance.Network_drawFromPlaceArea();
                 }
 
                 else
@@ -128,19 +129,20 @@ public class DragDrop : MonoBehaviour
     {
         insertIntoArea();
         CardHandler.Instance.setDrawCardsAndArea(false, false);
+        CardHandler.Instance.setPlayerClickDragAndArea(false, false, false); 
+        CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
+        Card card = GetComponent<Card>();
+        //set selected card locally, since index is out of sync between clients
         if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
         { 
-            CardHandler.Instance.playerSelectedCard =  GetComponent<Card>();
-            CardHandler.Instance.setPlayerClickDragAndArea(false, false, false); 
-            CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
+            CardHandler.Instance.playerSelectedCard = card;
+            card.back = CardHandler.Instance.playerBack;
         }
         else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
         {
-            CardHandler.Instance.enemySelectedCard = GetComponent<Card>();
-            CardHandler.Instance.setEnemyClickDragAndArea(false, false, false); 
-            CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
+            CardHandler.Instance.enemySelectedCard = card;
+            card.back = CardHandler.Instance.enemyBack;
         }
-        
     }
 
     //dropping in the player or enemy grid layout group
