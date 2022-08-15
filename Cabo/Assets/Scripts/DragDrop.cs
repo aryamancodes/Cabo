@@ -83,17 +83,17 @@ public class DragDrop : MonoBehaviour
                     transform.SetParent(placeArea.transform);
                     card.flipCard("up", false);
                     CardHandler.Instance.Network_playCard(startIndex, startParent.layer);
-                    
-                    //FIXME: Correctly detect who snaps the card
-                    // if(GameManager.Instance.currState == GameState.PLAY)
-                    // {
-                    //     GameState whoSnapped = GameState.NONE; 
-                    //     if(startParent.layer == GameManager.Instance.playerLayer){ whoSnapped = GameState.PLAYER_TURN; }
-                    //     else if(startParent.layer == GameManager.Instance.enemyLayer) { whoSnapped = GameState.ENEMY_TURN; }
-                    //     CardHandler.Instance.checkSnapped(whoSnapped); 
-                    // }
-                    // else { 
-                    CardHandler.Instance.cardPlayed(card); 
+                    if(!GameManager.Instance.canSnap)
+                    {
+                        CardHandler.Instance.cardPlayed(card);
+                    }
+                    else if(GameManager.Instance.canSnap)
+                    {
+                        GameState whoseCardSnapped= GameState.NONE; 
+                        if(startParent.layer == GameManager.Instance.playerLayer){ whoseCardSnapped = GameState.PLAYER_TURN; }
+                        else if(startParent.layer == GameManager.Instance.enemyLayer) { whoseCardSnapped = GameState.ENEMY_TURN; }
+                        CardHandler.Instance.checkSnapped(whoseCardSnapped); 
+                    }
                 }
 
                 else if(startParent.layer == GameManager.Instance.UILayer)
@@ -102,9 +102,12 @@ public class DragDrop : MonoBehaviour
                     CardHandler.Instance.Network_drawFromPlaceArea();
                 }
 
-                else
+                else if(GameManager.Instance.currState == GameState.SNAP_OTHER)
                 {
                     insertIntoArea();
+                    CardHandler.Instance.Network_giveOpponentCard(startIndex, startParent.layer);
+                    if(startParent.layer == GameManager.Instance.playerLayer){ GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW); }   
+                    else { GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW); }   
                 }
             }
 

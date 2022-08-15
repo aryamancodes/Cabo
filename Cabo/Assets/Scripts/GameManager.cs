@@ -8,7 +8,7 @@ using Photon.Realtime;
 // All the possible game states, seralized as byte to send over the network
 public enum GameState: byte
 { 
-    START=0, PLAYER_READY, PLAYER_DRAW, PLAYER_TURN, ENEMY_READY, ENEMY_DRAW, ENEMY_TURN, SNAP_PASS, SNAP_FAIL, 
+    START=0, PLAYER_READY, PLAYER_DRAW, PLAYER_TURN, ENEMY_READY, ENEMY_DRAW, ENEMY_TURN, SNAP_SELF, SNAP_OTHER, SNAP_FAIL, 
     BLIND_SWAP1, BLIND_SWAP2, SWAP1, SWAP2, PEAK_PLAYER, PEAK_ENEMY, PLAY, SPECIAL_PLAY, CABO, 
     GAME_OVER, REPLAY_NORMAL, REPLAY_FALSE_CABO, PAUSE, QUIT, NONE 
 }
@@ -33,6 +33,7 @@ public class GameManager : MonoBehaviourPunCallbacks
     public int enemyLayer;
     public int UILayer;
     public int IgnoreLayer;
+    public bool canSnap = false;
     public PhotonView view;
 
     void Awake()

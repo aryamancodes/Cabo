@@ -73,6 +73,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
  
         if(currState == GameState.PLAYER_DRAW)
         {
+            GameManager.Instance.canSnap = false;
             correctCardBacks();
             flipDownAllCards();
             overrideSpecialCards(); 
@@ -84,6 +85,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
         if(currState == GameState.ENEMY_DRAW)
         {
+            GameManager.Instance.canSnap = false;
             correctCardBacks();
             flipDownAllCards();
             overrideSpecialCards(); 
@@ -93,21 +95,12 @@ public class CardHandler : MonoBehaviourPunCallbacks
             else { setDrawCardsAndArea(false, false); }
         }
 
-        if(currState == GameState.PLAY)
+        if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
         {
             setDrawCardsAndArea(false, false);
             if(played != null) { played.button.interactable = true; }
             setPlayerClickDragAndArea(true, true, false);
             setEnemyClickDragAndArea(true, true, false);
-        }
-
-        if(currState == GameState.SPECIAL_PLAY)
-        {
-            setDrawCardsAndArea(false, false);
-            if(played != null) { played.button.interactable = true; }
-            setPlayerClickDragAndArea(false, false, false);
-            setEnemyClickDragAndArea(false, false, false);
-
         }
 
         if(currState == GameState.PLAYER_TURN)
@@ -160,23 +153,66 @@ public class CardHandler : MonoBehaviourPunCallbacks
             }
         }
 
-        if(currState == GameState.SNAP_PASS)
+        if(currState == GameState.SNAP_SELF)
         {
-            setDrawCardsAndArea(false, false);
+            flipDownAllCards();
             if(prevState == GameState.PLAYER_TURN)
             {
-                setPlayerClickDragAndArea(true, true, false);
-                setEnemyClickDragAndArea(false, false, true);
+                GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW, prevState);
             }
-            if(prevState == GameState.ENEMY_TURN)
+            else
             {
-                setPlayerClickDragAndArea(false, true, true);
-                setEnemyClickDragAndArea(true, true, false);
+                GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW, prevState);
+            }
+        }
+
+        if(currState == GameState.SNAP_OTHER)
+        {
+            flipDownAllCards();
+            setDrawCardsAndArea(false, false);         
+            if(prevState == GameState.PLAYER_TURN)
+            {   
+                setEnemyClickDragAndArea(false, false, true);         
+                if(PhotonNetwork.IsMasterClient)
+                {
+                    setPlayerClickDragAndArea(true, true, true);
+                }
+                else { setPlayerClickDragAndArea(false, false, false); }
+            }
+            else
+            {
+                setPlayerClickDragAndArea(false, false, true);         
+                if(!PhotonNetwork.IsMasterClient)
+                {
+                    setEnemyClickDragAndArea(true, true, true);
+                }
+                else { setEnemyClickDragAndArea(false, false, false); }
+                
+            }
+        }
+
+        if(currState == GameState.SNAP_FAIL)
+        {
+            flipDownAllCards();
+            returnPlacedCard(); 
+            if(prevState == GameState.PLAYER_TURN)
+            {   
+                setEnemyClickDragAndArea(false, false, false);
+                setPlayerClickDragAndArea(false, false, true);
+                if(PhotonNetwork.IsMasterClient) { setDrawCardsAndArea(true, false); }
+                else { setDrawCardsAndArea(false, false); }
+            }
+            else
+            {
+                setPlayerClickDragAndArea(false, false, false);         
+                setEnemyClickDragAndArea(false, false, true);
+                if(!PhotonNetwork.IsMasterClient) { setDrawCardsAndArea(true, false); }
+                else { setDrawCardsAndArea(false, false); }
             }
         }
     }
 
-     public void firstDistribute()
+    public void firstDistribute()
     {
         for(int i=0; i<4; ++i)
         {    
@@ -224,16 +260,18 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
     public void Button_onDrawCard()
     {
-        view.RPC(nameof(RPC_OnDrawCard), RpcTarget.All, true);
+        bool isPunishment = false;
+        if(GameManager.Instance.currState == GameState.SNAP_FAIL) { isPunishment = true; }
+        view.RPC(nameof(RPC_OnDrawCard), RpcTarget.All, true, isPunishment);
     }
 
     public void Network_drawFromPlaceArea()
     {
-        view.RPC(nameof(RPC_OnDrawCard), RpcTarget.Others, false);
+        view.RPC(nameof(RPC_OnDrawCard), RpcTarget.Others, false, false);
     } 
-    
+
     [PunRPC]
-    public void RPC_OnDrawCard(bool fromDrawPile)
+    public void RPC_OnDrawCard(bool fromDrawPile, bool isPunishment)
     {
         Card drawnCard = null;
         GameObject slot = null;
@@ -247,36 +285,40 @@ public class CardHandler : MonoBehaviourPunCallbacks
             int length = placeArea.transform.childCount;
             drawnCard = placeArea.transform.GetChild(length-1).GetComponent<Card>();
         }
-        slot = Instantiate(emptyCard.slot, new Vector2(0,0), Quaternion.identity); 
-        
-        if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
+        slot = Instantiate(emptyCard.slot, new Vector2(0,0), Quaternion.identity);
+
+        GameState curr = GameManager.Instance.currState;
+        GameState prev = GameManager.Instance.prevState;
+
+        if(curr == GameState.PLAYER_DRAW || (curr == GameState.SNAP_FAIL && prev == GameState.PLAYER_TURN) )
         {
             slot.layer = GameManager.Instance.playerLayer;
             drawnCard.back = playerBack;
-            insertDrawnCard(playerArea, slot, drawnCard);
+            insertDrawnCard(playerArea, slot, drawnCard, null, isPunishment);
             playerSelectedCard = drawnCard;
             setPlayerClickDragAndArea(false, false, true);
             setEnemyClickDragAndArea(false, false, false);
         }
-        else if(GameManager.Instance.currState == GameState.ENEMY_DRAW)
+        else if(curr == GameState.ENEMY_DRAW || (curr == GameState.SNAP_FAIL && prev == GameState.ENEMY_TURN))
         {
             slot.layer = GameManager.Instance.enemyLayer;
             drawnCard.back = enemyBack;
             enemySelectedCard = drawnCard;
-            insertDrawnCard(enemyArea, slot, null,drawnCard);
+            insertDrawnCard(enemyArea, slot, null, drawnCard, isPunishment);
             setPlayerClickDragAndArea(false, false, false);
             setEnemyClickDragAndArea(false, false, true);
         }
         setDrawCardsAndArea(false, false);
     }
 
-    public void insertDrawnCard(GameObject area, GameObject slot, Card playerCard=null, Card enemyCard=null)
+    public void insertDrawnCard(GameObject area, GameObject slot, Card playerCard, Card enemyCard, bool isPunishment)
     {
         Transform card;
         if(playerCard != null) 
         {
             card = playerCard.transform; 
-            if(PhotonNetwork.IsMasterClient) { playerCard.flipCard("up", false); }
+            if(isPunishment) { playerCard.flipCard("down", false); }
+            else if(PhotonNetwork.IsMasterClient) { playerCard.flipCard("up", false); }
             else 
             {
                 playerCard.flipCard("up", true); 
@@ -304,6 +346,11 @@ public class CardHandler : MonoBehaviourPunCallbacks
                 //destroy unnecessary slot creation and fix weird scale increase
                 card.localScale = new Vector3(1,1,1);
                 Destroy(slot);
+                if(isPunishment)
+                {
+                    if(GameManager.Instance.prevState == GameState.PLAYER_TURN) { GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW); }
+                    else { GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW); }
+                }
                 return;
             }
         }
@@ -312,6 +359,11 @@ public class CardHandler : MonoBehaviourPunCallbacks
         card.SetParent(slot.transform, false);
         card.gameObject.layer = area.layer;
         card.rotation = Quaternion.identity;
+        if(isPunishment)
+        {
+            if(GameManager.Instance.prevState == GameState.PLAYER_TURN) { GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW); }
+            else { GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW); }
+        }
     }
 
     // If a card is drawn and not played immediately, it is no longer special.
@@ -359,20 +411,29 @@ public class CardHandler : MonoBehaviourPunCallbacks
         }
     }
 
+
+    // Change a card's back to indicate the correct area, useful after card's have been 
+    // swapped or snapped. Flip card down to ensure that any change is rendered to the 
+    // CardBase's image.
+
     public void correctCardBacks()
     {
         foreach(Transform child in playerArea.transform)
         {
             if(child.childCount != 0)
             {
-                child.GetChild(0).GetComponent<Card>().back = playerBack;
+                Card card = child.GetChild(0).GetComponent<Card>(); 
+                card.back = playerBack;
+                card.flipCard("down", false);
             }
         }
         foreach(Transform child in enemyArea.transform)
         {
             if(child.childCount != 0)
             {
-                child.GetChild(0).GetComponent<Card>().back = enemyBack;
+                Card card = child.GetChild(0).GetComponent<Card>(); 
+                card.back = enemyBack;
+                card.flipCard("down", false);
             }
         }
     }
@@ -397,8 +458,8 @@ public class CardHandler : MonoBehaviourPunCallbacks
             if(child.childCount != 0)
             {
                 Card card = child.GetChild(0).GetComponent<Card>();
-                if(card == playerSelectedCard || card == enemySelectedCard){ continue; }
                 card.canDrag = dragVal;
+                if(card == playerSelectedCard || card == enemySelectedCard){ continue; }
                 card.button.interactable = clickVal;
             }
         }
@@ -412,8 +473,8 @@ public class CardHandler : MonoBehaviourPunCallbacks
             if(child.childCount != 0)
             {
                 Card card = child.GetChild(0).GetComponent<Card>();
-                if(card == playerSelectedCard || card == enemySelectedCard){ continue; }
                 card.canDrag = dragVal;
+                if(card == playerSelectedCard || card == enemySelectedCard){ continue; }
                 card.button.interactable = clickVal;
             }
         }
@@ -425,6 +486,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         played = card;
         if(played != null)
         {
+            GameManager.Instance.canSnap = true;
             if(card.isSpecialCard)
             {
                 GameManager.Instance.Network_setGameState(GameState.SPECIAL_PLAY);
@@ -433,6 +495,31 @@ public class CardHandler : MonoBehaviourPunCallbacks
             {
                 GameManager.Instance.Network_setGameState(GameState.PLAY);
             }   
+        }
+    }
+
+    //Return back a card played as a failed snap
+    public void returnPlacedCard()
+    {
+        GameObject originalParent = null;
+        if(GameManager.Instance.prevState == GameState.PLAYER_TURN) { originalParent = playerArea; }
+        else{ originalParent = enemyArea; }
+
+        int length = placeArea.transform.childCount;
+        Card card = placeArea.transform.GetChild(length-1).GetComponent<Card>();
+        card.flipCard("down", false);
+        card.button.interactable = false;
+        //returning card can always be inserted into a slot
+        foreach(Transform child in originalParent.transform)
+        {
+            if(child.childCount == 0)
+            {
+                card.transform.SetParent(child, true);
+                card.transform.gameObject.layer = originalParent.layer;
+                card.transform.rotation = Quaternion.identity;
+                //fix weird scale increase
+                card.transform.localScale = new Vector3(1,1,1);
+            }
         }
     }
 
@@ -454,21 +541,31 @@ public class CardHandler : MonoBehaviourPunCallbacks
         enemySelectedCard.flipCard("down", false);
     }
 
-    public void checkSnapped(GameState who)
+    public void checkSnapped(GameState whoseCardSnapped)
     {
+        GameState whoSnapped = GameState.NONE;
+        if(PhotonNetwork.IsMasterClient){ whoSnapped = GameState.PLAYER_TURN; }
+        else { whoSnapped = GameState.ENEMY_TURN; }
         int length = placeArea.transform.childCount;
-        if(length >=2 )
+        if(length >= 2 )
         {
             int lastPlayedCard = placeArea.transform.GetChild(length-2).GetComponent<Card>().value;
             int snappedCard =  placeArea.transform.GetChild(length-1).GetComponent<Card>().value;
+            GameState prev = GameManager.Instance.prevState;
             //check for same card values or the special case where red kings have a different value to black kings
-            if(lastPlayedCard == snappedCard || lastPlayedCard == 13 && snappedCard == -1 || lastPlayedCard == 13 && snappedCard == -1)
+            if(lastPlayedCard == snappedCard || lastPlayedCard == 13 && snappedCard == -1 || lastPlayedCard == 13 && snappedCard == -1 || true)
             {
-                GameManager.Instance.Network_setGameState(GameState.SNAP_PASS, who);
+                if(whoseCardSnapped == whoSnapped)
+                {
+                    GameManager.Instance.Network_setGameState(GameState.SNAP_SELF, whoSnapped);
+                }
+                else { GameManager.Instance.Network_setGameState(GameState.SNAP_OTHER, whoSnapped); }
+                
                 return;
             }
+            GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped);
         }
-        GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, who);
+        else { GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped); }
     }
 
 
@@ -541,5 +638,49 @@ public class CardHandler : MonoBehaviourPunCallbacks
         played.transform.gameObject.layer = placeArea.layer;
         played.transform.SetParent(placeArea.transform);
         played.flipCard("up", false);
+        GameManager.Instance.canSnap = true;
+    }
+
+    public void Network_giveOpponentCard(int index, int startParentLayer)
+    {
+        view.RPC(nameof(RPC_giveOpponentCard), RpcTarget.Others, index, startParentLayer);
+    }
+    [PunRPC]
+    public void RPC_giveOpponentCard(int index, int startParentLayer)
+    {
+        GameObject from;
+        GameObject to;
+        if(startParentLayer == GameManager.Instance.playerLayer) 
+        { 
+            from = playerArea; 
+            to = enemyArea;
+        }
+        else 
+        { 
+            from = enemyArea;
+            to = playerArea;
+        }
+
+        Card card = from.transform.GetChild(index).GetChild(0).GetComponent<Card>();
+        //replace a previously moved card
+
+        foreach(Transform child in to.transform)
+        {
+            if(child.childCount == 0)
+            {
+                card.transform.SetParent(child, true);
+                card.transform.gameObject.layer = to.layer;
+                card.transform.rotation = Quaternion.identity;
+                return;
+            }
+        }
+        //insert as a new card 
+        GameObject newSlot = Instantiate(card.slot, new Vector2(0,0), Quaternion.identity);
+        newSlot.transform.SetParent(to.transform, false);
+        newSlot.gameObject.layer = to.layer;
+        transform.SetParent(newSlot.transform, false);
+        transform.gameObject.layer = to.layer;
+        transform.rotation = Quaternion.identity; 
+        card.flipCard("down", false);
     }
 }

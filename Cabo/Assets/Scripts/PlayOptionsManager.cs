@@ -21,14 +21,15 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
                                                 , "Waiting for opponent to draw card!"} },
         { GameState.PLAYER_TURN, new List<string>{"Place a card in the middle to play!", "Waiting for opponent to play a card!"} },
         { GameState.PLAY, new List<string>{"Don't forget to end turn or snap a card!", "Waiting for opponent to end turn. Don't forget you can snap a card now!"} },
-        { GameState.SPECIAL_PLAY, new List<string>{"Select a special option or end turn!", "Waiting for opponent to end turn!"} },
+        { GameState.SPECIAL_PLAY, new List<string>{"Select a special option, end turn or snap a card!", "Waiting for opponent to end turn. Don't forget you can snap a card now!"} },
         { GameState.PEAK_PLAYER, new List<string>{"Select one of the available cards to peak!", "Waiting for opponent to peak!"} },
         { GameState.PEAK_ENEMY, new List<string>{"Select one of the available cards to peak!", "Waiting for opponent to peak!"} },
         { GameState.BLIND_SWAP1, new List<string>{"Select one of your cards to swap!", "Waiting for opponent to swap cards!"} },
         { GameState.BLIND_SWAP2, new List<string>{"Select one of the opponent's cards to swap!", "Waiting for opponent to swap cards!"} },
         { GameState.SWAP1, new List<string>{"Select one of your cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
         { GameState.SWAP2, new List<string>{"Select one of the opponent's cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
-        { GameState.SNAP_PASS, new List<string>{"You've succesfully snapped a card :) Drag one of your cards into the opponent's area", "Your card got snapped!"} },
+        { GameState.SNAP_OTHER, new List<string>{"You've correctly snapped a card :) Drag one of your cards into the opponent's area", "Your card got snapped!"} },
+        { GameState.SNAP_FAIL, new List<string>{"You incorrectly snapped a card :( Draw a card", "Your opponent snapped incorrectly. Waiting for them to draw!"} },
     };
 
     void Awake()
@@ -250,7 +251,20 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
                 setHint(player_hint, dict[currState][1]);
                 setHint(enemy_hint, dict[currState][0]);
             }
-            
+        }
+
+        if(currState == GameState.SNAP_OTHER || currState == GameState.SNAP_FAIL)
+        {
+            if(prevState == GameState.PLAYER_TURN)
+            {
+                setHint(player_hint, dict[currState][0]);
+                setHint(enemy_hint, dict[currState][1]);
+            }
+            else if(prevState == GameState.ENEMY_TURN)
+            {
+                setHint(player_hint, dict[currState][1]);
+                setHint(enemy_hint, dict[currState][0]);
+            }
         }
     }
 }
