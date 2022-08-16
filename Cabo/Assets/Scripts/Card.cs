@@ -157,7 +157,7 @@ public class Card : MonoBehaviour
                 if(faceUp == true)
                 {
                     button.interactable = false;
-                    GameManager.Instance.Network_setGameState(GameState.PLAYER_TURN);
+                    GameManager.Instance.Network_setGameState(GameState.PLAYER_TURN, prevState);
                 }
                 break;
             }
@@ -250,7 +250,7 @@ public class Card : MonoBehaviour
                     int index = flipCard(false);
                     CardHandler.Instance.Network_enemyCardFlipped(index, true);
                     button.interactable = false;
-                    GameManager.Instance.Network_setGameState(GameState.ENEMY_TURN);
+                    GameManager.Instance.Network_setGameState(GameState.ENEMY_TURN, prevState);
                 }
                 break;
             }

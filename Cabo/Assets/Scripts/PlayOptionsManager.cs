@@ -30,6 +30,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         { GameState.SWAP2, new List<string>{"Select one of the opponent's cards to peak and swap if you wish!", "Waiting for opponent to peak & swap cards!"} },
         { GameState.SNAP_OTHER, new List<string>{"You've correctly snapped a card :) Drag one of your cards into the opponent's area", "Your card got snapped!"} },
         { GameState.SNAP_FAIL, new List<string>{"You incorrectly snapped a card :( Draw a card", "Your opponent snapped incorrectly. Waiting for them to draw!"} },
+        { GameState.CABO, new List<string>{"Cabo has been called. End the game by clicking end turn or try self-snapping", "Waiting to end game!"} },
     };
 
     void Awake()
@@ -137,16 +138,33 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
         if(currState == GameState.PLAYER_TURN)
         {
-            setHint(player_hint, dict[currState][0]);
-            setHint(enemy_hint, dict[currState][1]);
+            if(prevState == GameState.CABO)
+            {
+                setHint(player_hint, dict[prevState][0]);
+                setHint(enemy_hint, dict[prevState][1]);
+
+            }
+            else
+            {
+                setHint(player_hint, dict[currState][0]);
+                setHint(enemy_hint, dict[currState][1]);
+            }
         }
 
         if(currState == GameState.ENEMY_TURN)
         {
-            setHint(player_hint, dict[GameState.PLAYER_TURN][1]);
-            setHint(enemy_hint, dict[GameState.PLAYER_TURN][0]);
-        }
+            if(prevState == GameState.CABO)
+            {
+                setHint(player_hint, dict[prevState][1]);
+                setHint(enemy_hint, dict[prevState][0]);
 
+            }
+            else
+            {
+                setHint(player_hint, dict[GameState.PLAYER_TURN][1]);
+                setHint(enemy_hint, dict[GameState.PLAYER_TURN][0]);
+            }
+        }
 
         if(currState == GameState.PLAY || currState == GameState.SPECIAL_PLAY)
         {
@@ -161,6 +179,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
                 setHint(enemy_hint, dict[currState][0]);
             }
             showOption("end_turn", true);
+            showOption("cabo", true);
         }
 
         if(currState == GameState.SPECIAL_PLAY)
@@ -264,6 +283,55 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
             {
                 setHint(player_hint, dict[currState][1]);
                 setHint(enemy_hint, dict[currState][0]);
+            }
+        }
+
+        if(currState == GameState.CABO)
+        {
+            showOption("end_turn", true);
+        }
+
+        if(currState == GameState.GAME_OVER)
+        {
+            int playerScore = 0;
+            int enemyScore = 0;
+
+            Transform playerArea = CardHandler.Instance.playerArea.transform;
+            Transform enemyArea = CardHandler.Instance.enemyArea.transform;    
+            foreach(Transform child in playerArea)
+            {
+                if(child.childCount != 0)
+                {
+                    playerScore += child.GetChild(0).GetComponent<Card>().value;
+                }
+            }
+            foreach(Transform child in enemyArea)
+            {
+                if(child.childCount != 0)
+                {
+                    enemyScore += child.GetChild(0).GetComponent<Card>().value;
+                }
+            }
+
+            if(playerScore > enemyScore)
+            {
+                string winnerHint = "You win! You scored " + enemyScore + " points whereas your oppponent scored " + playerScore + " points.";
+                string loserHint = "You lost! You scored " + playerScore + " points whereas your oppponent scored " + enemyScore + " points.";
+                setHint(player_hint, loserHint);
+                setHint(enemy_hint, winnerHint);   
+            }
+            else if(enemyScore > playerScore)
+            {
+                string winnerHint = "You win! You scored " + playerScore + " points whereas your oppponent scored " + enemyScore + " points.";
+                string loserHint = "You lost! You scored " + enemyScore + " points whereas your oppponent scored " + playerScore + " points.";
+                setHint(player_hint, winnerHint);
+                setHint(enemy_hint, loserHint);
+            }
+            else
+            {
+                string tieHint = "It's a tie. You and your opponent both scored " + playerScore + " points.";
+                setHint(player_hint, tieHint);
+                setHint(enemy_hint, tieHint);
             }
         }
     }

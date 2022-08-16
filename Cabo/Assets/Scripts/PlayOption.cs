@@ -37,14 +37,30 @@ public class PlayOption : MonoBehaviour
         button.interactable = false;
         if(optionName == "end_turn")
         {
-            if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
+            if(GameManager.Instance.currState == GameState.CABO)
+            {
+                GameManager.Instance.Network_setGameState(GameState.GAME_OVER);
+            }   
+            else if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
             {
                 GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW);
             }
-            else
+            else if(GameManager.Instance.prevState == GameState.ENEMY_TURN)
             {
                 GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
             }
+        }
+
+        if(optionName == "cabo")
+        {
+            if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
+            {
+                GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW, GameState.CABO);
+            }
+            else
+            {
+                GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW, GameState.CABO);
+            }        
         }
 
         if(optionName == "blind_swap")

@@ -210,6 +210,14 @@ public class CardHandler : MonoBehaviourPunCallbacks
                 else { setDrawCardsAndArea(false, false); }
             }
         }
+
+        if(currState == GameState.GAME_OVER)
+        {
+            setDrawCardsAndArea(false, false);
+            setPlayerClickDragAndArea(true, false, false);
+            setEnemyClickDragAndArea(true, false, false);
+            flipUpAllCards();
+        }
     }
 
     public void firstDistribute()
@@ -411,6 +419,24 @@ public class CardHandler : MonoBehaviourPunCallbacks
         }
     }
 
+    public void flipUpAllCards()
+    {
+        foreach(Transform child in playerArea.transform)
+        {
+            if(child.childCount != 0)
+            {
+                child.GetChild(0).GetComponent<Card>().flipCard("up", false);
+            }
+        }
+        foreach(Transform child in enemyArea.transform)
+        {
+            if(child.childCount != 0)
+            {
+                child.GetChild(0).GetComponent<Card>().flipCard("up", false);
+            }
+        }
+    }
+
 
     // Change a card's back to indicate the correct area, useful after card's have been 
     // swapped or snapped. Flip card down to ensure that any change is rendered to the 
@@ -486,8 +512,12 @@ public class CardHandler : MonoBehaviourPunCallbacks
         played = card;
         if(played != null)
         {
-            GameManager.Instance.canSnap = true;
-            if(card.isSpecialCard)
+            GameManager.Instance.canSnap = true; 
+            if(GameManager.Instance.prevState == GameState.CABO)
+            {
+                GameManager.Instance.Network_setGameState(GameState.CABO);
+            }
+            else if(card.isSpecialCard)
             {
                 GameManager.Instance.Network_setGameState(GameState.SPECIAL_PLAY);
             }
@@ -553,17 +583,18 @@ public class CardHandler : MonoBehaviourPunCallbacks
             int snappedCard =  placeArea.transform.GetChild(length-1).GetComponent<Card>().value;
             GameState prev = GameManager.Instance.prevState;
             //check for same card values or the special case where red kings have a different value to black kings
-            if(lastPlayedCard == snappedCard || lastPlayedCard == 13 && snappedCard == -1 || lastPlayedCard == 13 && snappedCard == -1 || true)
+            if(lastPlayedCard == snappedCard || lastPlayedCard == 13 && snappedCard == -1 || lastPlayedCard == 13 && snappedCard == -1)
             {
                 if(whoseCardSnapped == whoSnapped)
                 {
-                    GameManager.Instance.Network_setGameState(GameState.SNAP_SELF, whoSnapped);
+                    if(GameManager.Instance.currState == GameState.CABO) { GameManager.Instance.Network_setGameState(GameState.GAME_OVER); }
+                    else{ GameManager.Instance.Network_setGameState(GameState.SNAP_SELF, whoSnapped); }
                 }
                 else { GameManager.Instance.Network_setGameState(GameState.SNAP_OTHER, whoSnapped); }
                 
                 return;
             }
-            GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped);
+           { GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped); }
         }
         else { GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped); }
     }
@@ -638,13 +669,16 @@ public class CardHandler : MonoBehaviourPunCallbacks
         played.transform.gameObject.layer = placeArea.layer;
         played.transform.SetParent(placeArea.transform);
         played.flipCard("up", false);
-        GameManager.Instance.canSnap = true;
+        //allow snapping if Cabo has not been called
+        if(GameManager.Instance.prevState != GameState.CABO) { GameManager.Instance.canSnap = true; }
+        
     }
 
     public void Network_giveOpponentCard(int index, int startParentLayer)
     {
         view.RPC(nameof(RPC_giveOpponentCard), RpcTarget.Others, index, startParentLayer);
     }
+
     [PunRPC]
     public void RPC_giveOpponentCard(int index, int startParentLayer)
     {
@@ -682,5 +716,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
         transform.gameObject.layer = to.layer;
         transform.rotation = Quaternion.identity; 
         card.flipCard("down", false);
-    }
+    } 
+
+    
 }
