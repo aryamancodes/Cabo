@@ -147,10 +147,6 @@ public class DragDrop : MonoBehaviour
     void drawFromPlaceArea()
     {
         insertIntoArea();
-        CardHandler.Instance.setDrawCardsAndArea(false, false);
-        CardHandler.Instance.setPlayerClickDragAndArea(false, false, false); 
-        CardHandler.Instance.setPlayerClickDragAndArea(false, false, false);
-        Card card = GetComponent<Card>();
         //set selected card locally, since index is out of sync between clients
         if(GameManager.Instance.currState == GameState.PLAYER_DRAW)
         { 
@@ -162,6 +158,9 @@ public class DragDrop : MonoBehaviour
             CardHandler.Instance.enemySelectedCard = card;
             card.back = CardHandler.Instance.enemyBack;
         }
+        CardHandler.Instance.setDrawCardsAndArea(false, false);
+        CardHandler.Instance.setPlayerClickDragAndArea(false, false, false); 
+        CardHandler.Instance.setPlayerClickDragAndArea(false, false, false); 
     }
 
     //dropping in the player or enemy grid layout group

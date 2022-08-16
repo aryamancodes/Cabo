@@ -57,8 +57,10 @@ public class DeckGenerator: MonoBehaviourPunCallbacks
                     deck.Add(CardBase.CreateInstance(hidden, dict[suit][i], -1, suit, false));
                     continue;
                 }
+                //aces have a value of 0
+                if(i==0) { deck.Add(CardBase.CreateInstance(hidden, dict[suit][i], 0, suit, special)); }
+                else{ deck.Add(CardBase.CreateInstance(hidden, dict[suit][i], i+1, suit, special)); } 
 
-                deck.Add(CardBase.CreateInstance(hidden, dict[suit][i], i+1, suit, special));
             }
         }
         Shuffle(deck, seed);
@@ -81,8 +83,21 @@ public class DeckGenerator: MonoBehaviourPunCallbacks
 
     public CardBase getCard()
     {
-        var card = deck[0];
-        deck.RemoveAt(0);
-        return card;
+        {
+            var card = deck[0];
+            deck.RemoveAt(0);
+
+            //if all the cards have been drawn, re-generate the cards in the placePile
+            if(deck.Count == 0)
+            {
+                foreach(Transform child in CardHandler.Instance.placeArea.transform)
+                {
+                    CardBase insertBack = child.GetComponent<Card>().card;
+                    bool special = insertBack.value > 6 && !(insertBack.value == 12 && (insertBack.suit == CardBase.Suit.Heart || insertBack.suit == CardBase.Suit.Diamond));
+                    deck.Add(CardBase.CreateInstance(hidden, insertBack.shownFace, insertBack.value, insertBack.suit, insertBack.isSpecialCard));
+                }
+            }
+            return card;
+        }
     }
 }
