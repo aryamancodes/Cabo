@@ -108,7 +108,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
             flipDownAllCards();
             setDrawCardsAndArea(false, true);
             setEnemyClickDragAndArea(false, false, false);
-            if(PhotonNetwork.IsMasterClient) { setPlayerClickDragAndArea(true, true, false); } 
+            if(PhotonNetwork.IsMasterClient) { setPlayerClickDragAndArea(true, true, true); } 
             else { setPlayerClickDragAndArea(false, false, false); } 
         }
 
@@ -117,7 +117,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
             flipDownAllCards();
             setDrawCardsAndArea(false, true);
             setPlayerClickDragAndArea(false, false, false);
-            if(!PhotonNetwork.IsMasterClient) { setEnemyClickDragAndArea(true, true, false); } 
+            if(!PhotonNetwork.IsMasterClient) { setEnemyClickDragAndArea(true, true, true); } 
             else { setEnemyClickDragAndArea(false, false, false); } 
         }
 
@@ -587,8 +587,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
             {
                 if(whoseCardSnapped == whoSnapped)
                 {
-                    if(GameManager.Instance.currState == GameState.CABO) { GameManager.Instance.Network_setGameState(GameState.GAME_OVER); }
-                    else{ GameManager.Instance.Network_setGameState(GameState.SNAP_SELF, whoSnapped); }
+                    GameManager.Instance.Network_setGameState(GameState.SNAP_SELF, prev);
                 }
                 else { GameManager.Instance.Network_setGameState(GameState.SNAP_OTHER, whoSnapped); }
                 
@@ -717,6 +716,24 @@ public class CardHandler : MonoBehaviourPunCallbacks
         transform.rotation = Quaternion.identity; 
         card.flipCard("down", false);
     } 
+
+    public void Network_setLockCards(bool val)
+    {
+        view.RPC(nameof(RPC_setLockCards), RpcTarget.Others, val);
+    }
+
+    [PunRPC]
+    public void RPC_setLockCards(bool val)
+    {
+        setPlayerClickDragAndArea(val, val, val);
+        setEnemyClickDragAndArea(val, val, val);
+        setDrawCardsAndArea(val, val);
+        //restore the values before locking
+        if(val)
+        {
+            OnGameStateChanged();
+        }
+    }
 
     
 }

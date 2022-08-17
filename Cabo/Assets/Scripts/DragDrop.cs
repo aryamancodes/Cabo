@@ -60,79 +60,70 @@ public class DragDrop : MonoBehaviour
         if(card.canDrag)
         {
             isDragging = true;
+            CardHandler.Instance.Network_setLockCards(false);
         }
     }
 
     public void stopDrag()
     {
+        CardHandler.Instance.Network_setLockCards(true);
         if(card.canDrag)
         {
             isDragging = false;
 
-            if(dropZone != null)
+            if(dropZone == null || dropZone.layer == startParent.layer || dropZone.layer == GameManager.Instance.IgnoreLayer) { returnToStart(); }
+
+            else if(dropZone.layer == GameManager.Instance.UILayer) //drop card into center
             {
-                if(dropZone.layer == GameManager.Instance.IgnoreLayer)
-                {
-                    returnToStart();
-                }
-                if(dropZone.layer == GameManager.Instance.UILayer && startParent.layer != GameManager.Instance.UILayer) //drop card into center
-                {
-                    transform.position = placeArea.transform.position;
-                    transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
-                    gameObject.layer = placeArea.layer;
-                    transform.SetParent(placeArea.transform);
-                    card.flipCard("up", false);
+                transform.position = placeArea.transform.position;
+                transform.rotation = Quaternion.Euler(new Vector3(0,0,Random.Range(-30f, 30f)));
+                gameObject.layer = placeArea.layer;
+                transform.SetParent(placeArea.transform);
+                card.flipCard("up", false);
 
-                    // A lil cheat that I always do irl - and will do online ;), no snap fail punishment 
-                    // after Cabo is called 
-                    if(GameManager.Instance.currState == GameState.CABO)
-                    {
-                        int length = placeArea.transform.childCount;
-                        int lastPlayedValue = placeArea.transform.GetChild(length-2).GetComponent<Card>().value;
-                        bool syncMove = card.value == lastPlayedValue || (card.value == 13 && lastPlayedValue == -1) || (card.value == -1 && lastPlayedValue == -1) ;
-                        if(syncMove){ CardHandler.Instance.Network_playCard(startIndex, startParent.layer); }
-                        else
-                        { 
-                            returnToStart(); 
-                            GameManager.Instance.Network_setGameState(GameState.GAME_OVER);
-                            return;                 
-                        }
-                    }
-                    else{ CardHandler.Instance.Network_playCard(startIndex, startParent.layer); } 
-                    if(!GameManager.Instance.canSnap)
-                    {
-                        CardHandler.Instance.cardPlayed(card);
-                    }
-                    else if(GameManager.Instance.canSnap)
-                    {
-                        GameState whoseCardSnapped= GameState.NONE; 
-                        if(startParent.layer == GameManager.Instance.playerLayer){ whoseCardSnapped = GameState.PLAYER_TURN; }
-                        else if(startParent.layer == GameManager.Instance.enemyLayer) { whoseCardSnapped = GameState.ENEMY_TURN; }
-                        CardHandler.Instance.checkSnapped(whoseCardSnapped); 
+                // A lil cheat that I always do irl - and will do online ;), no snap fail punishment 
+                // after Cabo is called 
+                if(GameManager.Instance.currState == GameState.CABO)
+                {
+                    int length = placeArea.transform.childCount;
+                    int lastPlayedValue = placeArea.transform.GetChild(length-2).GetComponent<Card>().value;
+                    bool syncMove = card.value == lastPlayedValue || (card.value == 13 && lastPlayedValue == -1) || (card.value == -1 && lastPlayedValue == -1) ;
+                    if(syncMove){ CardHandler.Instance.Network_playCard(startIndex, startParent.layer); }
+                    else
+                    { 
+                        returnToStart(); 
+                        GameManager.Instance.Network_setGameState(GameState.GAME_OVER);
+                        return;                 
                     }
                 }
-
-                else if(startParent.layer == GameManager.Instance.UILayer)
+                else{ CardHandler.Instance.Network_playCard(startIndex, startParent.layer); } 
+                if(!GameManager.Instance.canSnap)
                 {
-                    drawFromPlaceArea();
-                    CardHandler.Instance.Network_drawFromPlaceArea();
+                    CardHandler.Instance.cardPlayed(card);
                 }
-
-                else if(GameManager.Instance.currState == GameState.SNAP_OTHER)
+                else if(GameManager.Instance.canSnap)
                 {
-                    insertIntoArea();
-                    CardHandler.Instance.Network_giveOpponentCard(startIndex, startParent.layer);
-                    if(startParent.layer == GameManager.Instance.playerLayer){ GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW); }   
-                    else { GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW); }   
+                    GameState whoseCardSnapped= GameState.NONE; 
+                    if(startParent.layer == GameManager.Instance.playerLayer){ whoseCardSnapped = GameState.PLAYER_TURN; }
+                    else if(startParent.layer == GameManager.Instance.enemyLayer) { whoseCardSnapped = GameState.ENEMY_TURN; }
+                    CardHandler.Instance.checkSnapped(whoseCardSnapped); 
                 }
             }
 
-            //return back to starting position
-            else
+            else if(startParent.layer == GameManager.Instance.UILayer)
             {
-                returnToStart();
-
+                drawFromPlaceArea();
+                CardHandler.Instance.Network_drawFromPlaceArea();
             }
+
+            else if(GameManager.Instance.currState == GameState.SNAP_OTHER)
+            {
+                insertIntoArea();
+                CardHandler.Instance.Network_giveOpponentCard(startIndex, startParent.layer);
+                if(startParent.layer == GameManager.Instance.playerLayer){ GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW); }   
+                else { GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW); }   
+            }
+
             dropZone = null;
         }
     }

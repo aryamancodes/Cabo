@@ -29,7 +29,9 @@ public class PlayOption : MonoBehaviour
             button.onClick.AddListener(Button_click); //subscribe to the onClick event
         }
     }
- 
+
+    public int countDown;
+
      //Handle the onClick event
     public void Button_click()
     {
@@ -57,7 +59,7 @@ public class PlayOption : MonoBehaviour
             {
                 GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW, GameState.CABO);
             }
-            else
+            else if(GameManager.Instance.prevState == GameState.ENEMY_TURN)
             {
                 GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW, GameState.CABO);
             }        

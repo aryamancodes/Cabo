@@ -127,11 +127,13 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
          if(currState == GameState.PLAYER_DRAW)
         {
+            if(prevState == GameState.CABO){ showOption("cabo"); }
             setHint(player_hint, dict[currState][0]);
             setHint(enemy_hint, dict[currState][1]);
         }
         if(currState == GameState.ENEMY_DRAW)
         {
+            if(prevState == GameState.CABO){ showOption("cabo"); }
             setHint(player_hint, dict[GameState.PLAYER_DRAW][1]);
             setHint(enemy_hint, dict[GameState.PLAYER_DRAW][0]);
         }
@@ -140,6 +142,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         {
             if(prevState == GameState.CABO)
             {
+                showOption("cabo"); 
                 setHint(player_hint, dict[prevState][0]);
                 setHint(enemy_hint, dict[prevState][1]);
 
@@ -155,6 +158,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         {
             if(prevState == GameState.CABO)
             {
+                showOption("cabo"); 
                 setHint(player_hint, dict[prevState][1]);
                 setHint(enemy_hint, dict[prevState][0]);
 
