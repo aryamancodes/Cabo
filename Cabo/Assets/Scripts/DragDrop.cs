@@ -88,13 +88,10 @@ public class DragDrop : MonoBehaviour
                     int length = placeArea.transform.childCount;
                     int lastPlayedValue = placeArea.transform.GetChild(length-2).GetComponent<Card>().value;
                     bool syncMove = card.value == lastPlayedValue || (card.value == 13 && lastPlayedValue == -1) || (card.value == -1 && lastPlayedValue == -1) ;
-                    if(syncMove){ CardHandler.Instance.Network_playCard(startIndex, startParent.layer); }
-                    else
-                    { 
-                        returnToStart(); 
-                        GameManager.Instance.Network_setGameState(GameState.GAME_OVER);
-                        return;                 
-                    }
+                    if(syncMove){ CardHandler.Instance.Network_playCard(startIndex, startParent.layer); } 
+                    else { returnToStart(); }
+                    GameManager.Instance.Network_setGameState(GameState.GAME_OVER);
+                    return;                 
                 }
                 else{ CardHandler.Instance.Network_playCard(startIndex, startParent.layer); } 
                 if(!GameManager.Instance.canSnap)

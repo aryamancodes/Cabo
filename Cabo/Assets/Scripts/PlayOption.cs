@@ -30,9 +30,7 @@ public class PlayOption : MonoBehaviour
         }
     }
 
-    public int countDown;
-
-     //Handle the onClick event
+    //Handle the onClick event
     public void Button_click()
     {
         GameState prev = GameManager.Instance.prevState;
