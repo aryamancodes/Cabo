@@ -100,4 +100,9 @@ public class DeckGenerator: MonoBehaviourPunCallbacks
             return card;
         }
     }
+
+    public void clearDeck()
+    {
+        deck.Clear();
+    }
 }

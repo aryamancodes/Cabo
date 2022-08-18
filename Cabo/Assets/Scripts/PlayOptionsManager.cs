@@ -31,6 +31,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         { GameState.SNAP_OTHER, new List<string>{"You've correctly snapped a card :) Drag one of your cards into the opponent's area", "Your card got snapped!"} },
         { GameState.SNAP_FAIL, new List<string>{"You incorrectly snapped a card :( Draw a card", "Your opponent snapped incorrectly. Waiting for them to draw!"} },
         { GameState.CABO, new List<string>{"Cabo has been called. End the game by clicking end turn or try self-snapping", "Waiting to end game!"} },
+        { GameState.REPLAY_PLAYER, new List<string>{"You want to play again. Waiting for opponent!", "Choose play again to restart!"} },
     };
 
     void Awake()
@@ -90,7 +91,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public IEnumerator CountdownAndShowExit (int seconds) 
+    public IEnumerator CountdownAndShowExitOptions (int seconds) 
     {
         var endTurn = showOption("end_turn", true);
         endTurn.button.interactable = false;
@@ -102,6 +103,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         }
         endTurn.Text.text = "END";
         endTurn.button.interactable = true;
+        showOption("cabo", true);
     }
     public void OnGameStateChanged()
     {
@@ -195,8 +197,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
                 setHint(player_hint, dict[currState][1]);
                 setHint(enemy_hint, dict[currState][0]);
             }
-            StartCoroutine(CountdownAndShowExit(3));
-            showOption("cabo", true);
+            StartCoroutine(CountdownAndShowExitOptions(3));
         }
 
         if(currState == GameState.SPECIAL_PLAY)
@@ -305,7 +306,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
         if(currState == GameState.CABO)
         {
-            StartCoroutine(CountdownAndShowExit(3));
+            showOption("end_turn", false);
         }
 
         if(currState == GameState.GAME_OVER)
@@ -349,6 +350,28 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
                 string tieHint = "It's a tie. You and your opponent both scored " + playerScore + " points.";
                 setHint(player_hint, tieHint);
                 setHint(enemy_hint, tieHint);
+            }
+
+            showOption("play_again", false);
+            showOption("quit", false);
+        }
+
+        if(currState == GameState.REPLAY_PLAYER)
+        {
+            setHint(player_hint, dict[currState][0]);
+            setHint(enemy_hint, dict[currState][1]);
+            if(!PhotonNetwork.IsMasterClient)
+            {
+                showOption("play_again", false);
+            }
+        }
+        if(currState == GameState.REPLAY_ENEMY)
+        {
+            setHint(player_hint, dict[GameState.REPLAY_PLAYER][1]);
+            setHint(enemy_hint, dict[GameState.REPLAY_PLAYER][0]);
+            if(PhotonNetwork.IsMasterClient)
+            {
+                showOption("play_again", false);
             }
         }
     }

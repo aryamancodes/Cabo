@@ -218,6 +218,27 @@ public class CardHandler : MonoBehaviourPunCallbacks
             setEnemyClickDragAndArea(true, false, false);
             flipUpAllCards();
         }
+
+        if(currState == GameState.REPLAY)
+        {
+            foreach(Transform child in playerArea.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            foreach(Transform child in enemyArea.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            foreach(Transform child in placeArea.transform)
+            {
+                Destroy(child.gameObject);
+            }
+            DeckGenerator.Instance.clearDeck();
+            if(PhotonNetwork.IsMasterClient)  
+            {
+                view.RPC("generateDeck", RpcTarget.All, Random.Range(1,300));
+            }   
+        }
     }
 
     public void firstDistribute()

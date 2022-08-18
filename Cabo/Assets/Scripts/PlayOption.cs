@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-public class PlayOption : MonoBehaviour
+using Photon.Pun;
+
+public class PlayOption : MonoBehaviourPunCallbacks
 {
     public string optionName;
     public Button button = null;
@@ -33,19 +35,20 @@ public class PlayOption : MonoBehaviour
     //Handle the onClick event
     public void Button_click()
     {
+        GameState curr = GameManager.Instance.currState;
         GameState prev = GameManager.Instance.prevState;
         button.interactable = false;
         if(optionName == "end_turn")
         {
-            if(GameManager.Instance.currState == GameState.CABO)
+            if(curr == GameState.CABO)
             {
                 GameManager.Instance.Network_setGameState(GameState.GAME_OVER);
             }   
-            else if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
+            else if(prev == GameState.PLAYER_TURN)
             {
                 GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW);
             }
-            else if(GameManager.Instance.prevState == GameState.ENEMY_TURN)
+            else if(prev == GameState.ENEMY_TURN)
             {
                 GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW);
             }
@@ -53,11 +56,11 @@ public class PlayOption : MonoBehaviour
 
         if(optionName == "cabo")
         {
-            if(GameManager.Instance.prevState == GameState.PLAYER_TURN)
+            if(prev == GameState.PLAYER_TURN)
             {
                 GameManager.Instance.Network_setGameState(GameState.ENEMY_DRAW, GameState.CABO);
             }
-            else if(GameManager.Instance.prevState == GameState.ENEMY_TURN)
+            else if(prev == GameState.ENEMY_TURN)
             {
                 GameManager.Instance.Network_setGameState(GameState.PLAYER_DRAW, GameState.CABO);
             }        
@@ -84,6 +87,23 @@ public class PlayOption : MonoBehaviour
         if(optionName == "peak_enemy")
         {
             GameManager.Instance.Network_setGameState(GameState.PEAK_ENEMY, prev);
+        }
+        if(optionName == "quit")
+        {
+
+        }
+        if(optionName == "play_again")
+        {
+            if(curr == GameState.GAME_OVER)
+            {
+                if(PhotonNetwork.IsMasterClient) { GameManager.Instance.Network_setGameState(GameState.REPLAY_PLAYER); }
+                else { GameManager.Instance.Network_setGameState(GameState.REPLAY_ENEMY); }
+            }
+
+            if(curr == GameState.REPLAY_PLAYER || curr == GameState.REPLAY_ENEMY)
+            {
+                GameManager.Instance.Network_setGameState(GameState.REPLAY);
+            }
         }
     }
 }
