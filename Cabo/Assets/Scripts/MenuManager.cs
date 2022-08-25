@@ -8,6 +8,11 @@ using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
 
+/* 
+    Class attached to the Main Menu scene, handles the setting of usernames,
+    as well as the creating, joining and leaving of a room. 
+*/
+
 public class MenuManager : MonoBehaviourPunCallbacks
 {
     public List<Menu> menus;
@@ -30,7 +35,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     void Start()
     {
         PhotonNetwork.ConnectUsingSettings();
-        GameManager.Instance.Network_setGameState(GameState.NONE);
+        GameManager.Instance.localSetGameState(GameState.NONE);
         closeAll();
         openMenu("loading");
     }

@@ -94,19 +94,23 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
     public IEnumerator CountdownAndShowExitOptions (int seconds) 
     {
         var endTurn = showOption("end_turn", true);
-        endTurn.button.interactable = false;
-        int counter = seconds;
-        while (counter > 0) {
-            endTurn.Text.text = counter.ToString();
-            yield return new WaitForSeconds (1);
-            counter--;
+        if(endTurn != null) 
+        { 
+            endTurn.button.interactable = false; 
+            int counter = seconds;
+            while (counter > 0) {
+                endTurn.Text.text = counter.ToString();
+                yield return new WaitForSeconds (1);
+                counter--;
+            }
+            endTurn.Text.text = "END";
+            endTurn.button.interactable = true;
+            showOption("cabo", true);
         }
-        endTurn.Text.text = "END";
-        endTurn.button.interactable = true;
-        showOption("cabo", true);
     }
     public void OnGameStateChanged()
     {
+        StopAllCoroutines();
         hideAllOptions();
         PlayOption player_hint = null;
         PlayOption enemy_hint = null;
@@ -306,7 +310,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
         if(currState == GameState.CABO)
         {
-            showOption("end_turn", false);
+            showOption("end_turn", true);
         }
 
         if(currState == GameState.GAME_OVER)

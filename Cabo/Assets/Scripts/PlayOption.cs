@@ -100,7 +100,7 @@ public class PlayOption : MonoBehaviourPunCallbacks
                 else { GameManager.Instance.Network_setGameState(GameState.REPLAY_ENEMY); }
             }
 
-            if(curr == GameState.REPLAY_PLAYER || curr == GameState.REPLAY_ENEMY)
+            else if(curr == GameState.REPLAY_PLAYER || curr == GameState.REPLAY_ENEMY)
             {
                 GameManager.Instance.Network_setGameState(GameState.REPLAY);
             }

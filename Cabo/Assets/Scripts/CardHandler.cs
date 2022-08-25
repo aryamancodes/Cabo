@@ -8,7 +8,8 @@ using Photon.Realtime;
 
 /*
     Static class that handles the distributing, flipping and other
-    player/enemy interactions with cards. 
+    player/enemy interactions with cards. Static wrappers for RPCs
+    are also defined in this class.
 */
 public class CardHandler : MonoBehaviourPunCallbacks
 {
@@ -46,10 +47,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
     void Start()
     {
         view = GetComponent<PhotonView>();
-        if(PhotonNetwork.IsMasterClient)  
-        {
-            view.RPC("generateDeck", RpcTarget.All, Random.Range(1,300));
-        }   
+        if(PhotonNetwork.IsMasterClient) { view.RPC("generateDeck", RpcTarget.All, Random.Range(1,300)); }   
     }
 
     // Generate the same unique deck across all clients
@@ -57,7 +55,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
     public void generateDeck(int seed)
     {
         DeckGenerator.Instance.generateDeck(seed);
-        GameManager.Instance.localSetGameState(GameState.START);
+        GameManager.Instance.localSetGameState(GameState.START, GameState.NONE);
     }
 
 
@@ -193,6 +191,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
         if(currState == GameState.SNAP_FAIL)
         {
+           // StartCoroutine(Wait(1.5f));
             flipDownAllCards();
             returnPlacedCard(); 
             if(prevState == GameState.PLAYER_TURN)
@@ -234,12 +233,20 @@ public class CardHandler : MonoBehaviourPunCallbacks
                 Destroy(child.gameObject);
             }
             DeckGenerator.Instance.clearDeck();
-            if(PhotonNetwork.IsMasterClient)  
+            if(PhotonNetwork.IsMasterClient)
             {
-                view.RPC("generateDeck", RpcTarget.All, Random.Range(1,300));
-            }   
+                int seed = Random.Range(1,300);
+                generateDeck(seed);
+                view.RPC(nameof(generateDeck), RpcTarget.Others, seed);
+            }
         }
     }
+
+    // public IEnumerator Wait(float time)
+    // {
+    //     Debug.Log("reached");
+    //     yield return new WaitForSeconds(time);
+    // }
 
     public void firstDistribute()
     {
@@ -611,12 +618,10 @@ public class CardHandler : MonoBehaviourPunCallbacks
                     GameManager.Instance.Network_setGameState(GameState.SNAP_SELF, prev);
                 }
                 else { GameManager.Instance.Network_setGameState(GameState.SNAP_OTHER, whoSnapped); }
-                
                 return;
             }
-           { GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped); }
         }
-        else { GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped); }
+        GameManager.Instance.Network_setGameState(GameState.SNAP_FAIL, whoSnapped);
     }
 
 
@@ -755,6 +760,4 @@ public class CardHandler : MonoBehaviourPunCallbacks
             OnGameStateChanged();
         }
     }
-
-    
 }

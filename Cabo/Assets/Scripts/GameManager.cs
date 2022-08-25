@@ -65,11 +65,10 @@ public class GameManager : MonoBehaviourPunCallbacks
             gameStateChanged();
         }
     }
-    //Static wrapper and RPC to communicate setGameState() over the locally and over the network
+    //Static wrapper and RPC to communicate setGameState() locally and over the network
     public void Network_setGameState(GameState newState, GameState prev=GameState.NONE)
     {
-        localSetGameState(newState, prev);
-        view.RPC(nameof(RPC_setGameState), RpcTarget.Others, (byte)newState, (byte) prev);
+        view.RPC(nameof(RPC_setGameState), RpcTarget.All, (byte)newState, (byte) prev);
     }
     [PunRPC]
     public void RPC_setGameState(byte newState, byte prev)

@@ -4,10 +4,8 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /*
-
     Class attached to each card object, determining the Sprite shown
     along with how to handle clicks
-
 */
 public class Card : MonoBehaviour
 {
@@ -53,17 +51,17 @@ public class Card : MonoBehaviour
         return transform.GetSiblingIndex();
     }
 
-    // Flips card, hiding the actual face from a client is necessary.
+    // Flips card to the opposite side, hiding the actual face from a client is necessary.
     // Returns the index of the card flipped.
     public int flipCard(bool hidden)
     {        
+        // Modify the base card face directly, otherwise changes don't sync
         if(faceUp)
         {
             image.sprite = back; 
             card.shownFace = back;
         }
 
-        // Modify the base card face directly, otherwise changes don't sync
         if(!faceUp && hidden) 
         { 
             image.sprite = card.hiddenFace; 
@@ -80,10 +78,12 @@ public class Card : MonoBehaviour
         return getIndex();
     }
 
-    // Flips a card, asserting its direction. Returns the index of the card 
-    // flipped.
+    // Flips a card to a specified direction, hiding the actual face from a client if necessary
+    // Returns the index of the card flipped.
     public int flipCard(string direction, bool hidden)
     {
+        // Modify the base card face directly, otherwise changes don't sync
+
         if(direction == "down")
         {
             image.sprite = back;
@@ -91,7 +91,6 @@ public class Card : MonoBehaviour
             faceUp = false;
         }
 
-        // Modify the base card face directly, otherwise changes don't sync
         else if(direction == "up" && hidden)
         {
             image.sprite = card.hiddenFace;
@@ -122,6 +121,8 @@ public class Card : MonoBehaviour
             enemyCardClicked();
         }
     }
+
+    // Handles the various cases when a card in the playerArea is clicked
     public void playerCardClicked()
     {
         var currState = GameManager.Instance.currState;
@@ -211,6 +212,7 @@ public class Card : MonoBehaviour
         }
     }
 
+    // Handles the various cases when a card in the enemyArea is clicked
     public void enemyCardClicked()
     {
         var currState = GameManager.Instance.currState;
