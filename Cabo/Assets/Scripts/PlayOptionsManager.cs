@@ -85,10 +85,11 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
     public void setHint(PlayOption who, string hint)
     {
-        if(who != null)
-        {
-            who.Text.text = hint;
-        }
+        if(who == null ) { return; }
+        int actorNumber = 1;
+        if(who.optionName == "enemy_text") { actorNumber = 2; }
+        string name = PhotonNetwork.CurrentRoom.GetPlayer(actorNumber).NickName;
+        who.Text.text = name + " :\n" + hint;
     }
 
     public IEnumerator CountdownAndShowExitOptions (int seconds) 

@@ -61,6 +61,7 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
     public void OnGameStateChanged()
     {
+        StopAllCoroutines();
         var currState = GameManager.Instance.currState;
         var prevState = GameManager.Instance.prevState;
         if(currState == GameState.START)
@@ -191,9 +192,8 @@ public class CardHandler : MonoBehaviourPunCallbacks
 
         if(currState == GameState.SNAP_FAIL)
         {
-           // StartCoroutine(Wait(1.5f));
             flipDownAllCards();
-            returnPlacedCard(); 
+            StartCoroutine(WaitAndReturnPlacedCard(0.25f));
             if(prevState == GameState.PLAYER_TURN)
             {   
                 setEnemyClickDragAndArea(false, false, false);
@@ -242,11 +242,11 @@ public class CardHandler : MonoBehaviourPunCallbacks
         }
     }
 
-    // public IEnumerator Wait(float time)
-    // {
-    //     Debug.Log("reached");
-    //     yield return new WaitForSeconds(time);
-    // }
+    public IEnumerator WaitAndReturnPlacedCard(float time)
+    {
+        yield return new WaitForSeconds(time);
+        returnPlacedCard();
+    }
 
     public void firstDistribute()
     {
