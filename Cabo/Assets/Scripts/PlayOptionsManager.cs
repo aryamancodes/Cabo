@@ -10,6 +10,7 @@ using Photon.Pun;
 */
 public class PlayOptionsManager : MonoBehaviourPunCallbacks
 {
+    public static PlayOptionsManager Instance;
     public List<PlayOption> options;
 
     //dictionary of hints of the form currState -> {active player hint, waiting player hint}
@@ -36,6 +37,7 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
 
     void Awake()
     {
+        Instance = this;
         GameManager.gameStateChanged += OnGameStateChanged;
         hideAllOptions();
 
@@ -115,8 +117,16 @@ public class PlayOptionsManager : MonoBehaviourPunCallbacks
         hideAllOptions();
         PlayOption player_hint = null;
         PlayOption enemy_hint = null;
-        if(PhotonNetwork.IsMasterClient) { player_hint = showOption("player_text"); }
-        else { enemy_hint = showOption("enemy_text"); }
+        if(PhotonNetwork.IsMasterClient) 
+        { 
+            player_hint = showOption("player_text"); 
+            showOption("player_pause");
+        }
+        else 
+        { 
+            enemy_hint = showOption("enemy_text"); 
+            showOption("enemy_pause");
+        }
         var currState = GameManager.Instance.currState;
         var prevState = GameManager.Instance.prevState;
         if(currState == GameState.START)

@@ -105,5 +105,41 @@ public class PlayOption : MonoBehaviourPunCallbacks
                 GameManager.Instance.Network_setGameState(GameState.REPLAY);
             }
         }
+
+        if(optionName == "player_pause")
+        {
+            if(PhotonNetwork.IsMasterClient) 
+            { 
+                PlayOptionsManager.Instance.showOption("pause_menu", false); 
+                PlayOptionsManager.Instance.showOption("pause_resume", false); 
+                PlayOptionsManager.Instance.showOption("pause_leave", false); 
+            }
+        }
+        if(optionName == "enemy_pause")
+        {
+            if(!PhotonNetwork.IsMasterClient)
+            {
+                PlayOptionsManager.Instance.showOption("pause_menu", false); 
+                PlayOptionsManager.Instance.showOption("pause_resume", false); 
+                PlayOptionsManager.Instance.showOption("pause_leave", false); 
+            }
+        }      
+
+        if(optionName == "pause_resume")
+        {
+            foreach(PlayOption option in PlayOptionsManager.Instance.options)
+            {
+                //close the pause menu
+                if(option.optionName == "pause_menu")
+                {
+                    option.close();
+                }
+                //allow the pause button to be reclicked
+                if(option.optionName == "player_pause" || option.optionName == "enemy_pause")
+                {
+                    option.button.interactable = true;
+                }
+            }
+        }
     }
 }
