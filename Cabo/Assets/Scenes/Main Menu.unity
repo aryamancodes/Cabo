@@ -3654,7 +3654,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 5
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -5189,7 +5189,7 @@ MonoBehaviour:
   m_enableAutoSizing: 1
   m_fontSizeMin: 5
   m_fontSizeMax: 72
-  m_fontStyle: 1
+  m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
@@ -5760,7 +5760,6 @@ MonoBehaviour:
   regionHint_text: {fileID: 887654087}
   regionPing_text: {fileID: 810095662}
   roomRegionPing_text: {fileID: 1022240378}
-  firstLogin: 1
 --- !u!1 &1119774789
 GameObject:
   m_ObjectHideFlags: 0

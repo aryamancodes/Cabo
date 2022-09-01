@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -759,5 +760,20 @@ public class CardHandler : MonoBehaviourPunCallbacks
         {
             OnGameStateChanged();
         }
+    }
+
+    //RPC called by PlayOption
+
+    public void Network_leaveGame()
+    {
+        view.RPC(nameof(RPC_leaveGame), RpcTarget.All, null);
+    }
+
+    [PunRPC]
+    public void RPC_leaveGame()
+    {
+        PhotonNetwork.LeaveRoom();
+        MenuManager.firstLogin = false;
+        SceneManager.LoadScene("Main Menu");
     }
 }

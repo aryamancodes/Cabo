@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using Photon.Pun;
+
 
 public class PlayOption : MonoBehaviourPunCallbacks
 {
@@ -75,23 +77,23 @@ public class PlayOption : MonoBehaviourPunCallbacks
         {
             GameManager.Instance.Network_setGameState(GameState.SWAP1, prev);
         }
+
         if(optionName == "swap")
         {
             CardHandler.Instance.Network_swapCards();
             GameManager.Instance.Network_setGameState(GameState.PLAY, prev);
         }
+
         if(optionName == "peak_player")
         {
             GameManager.Instance.Network_setGameState(GameState.PEAK_PLAYER, prev);
         }
+        
         if(optionName == "peak_enemy")
         {
             GameManager.Instance.Network_setGameState(GameState.PEAK_ENEMY, prev);
         }
-        if(optionName == "quit")
-        {
 
-        }
         if(optionName == "play_again")
         {
             if(curr == GameState.GAME_OVER)
@@ -140,6 +142,10 @@ public class PlayOption : MonoBehaviourPunCallbacks
                     option.button.interactable = true;
                 }
             }
+        }
+        if(optionName == "pause_leave" || optionName == "quit")
+        {
+            CardHandler.Instance.Network_leaveGame();
         }
     }
 }

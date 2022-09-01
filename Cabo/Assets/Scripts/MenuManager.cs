@@ -35,7 +35,7 @@ public class MenuManager : MonoBehaviourPunCallbacks
     public TMP_Text roomRegionPing_text;
 
 
-    public bool firstLogin = true;
+    public static bool firstLogin = true;
 
     void Start()
     {
@@ -233,7 +233,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
     {
         updatePlayerList();
         startButton.interactable = false;
-
     }
 
     public override void OnJoinedRoom()
@@ -287,7 +286,6 @@ public class MenuManager : MonoBehaviourPunCallbacks
             openMenu("error");
         }
     }
-
 
     //menu helper functions
     public void openMenu(string name)
